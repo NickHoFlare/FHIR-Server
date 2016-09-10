@@ -89,21 +89,35 @@ namespace ServerExperiment.Models.FHIR
             patient.Birthday = DateTime.Parse(birthday);
 
             // Patient Address
-            foreach (var address in source.Address)
+            List<string> addressLines1 = new List<string>();
+            List<string> addressLines2 = new List<string>();
+            List<string> postalCodes = new List<string>();
+            List<string> cities = new List<string>();
+            List<string> countries = new List<string>();
+            List<string> states = new List<string>();
+            List<string> periodStarts = new List<string>();
+            List<string> periodEnds = new List<string>();
+
+            for (int i = 0; i < source.Address.Count; i++)
             {
-                PatientAddressSet addressSet = new PatientAddressSet()
-                {
-                    AddressLine1 = address.LineElement[0].Value,
-                    AddressLine2 = address.LineElement[1].Value,
-                    City = address.City,
-                    State = address.State,
-                    PostalCode = address.PostalCode,
-                    PeriodStart = address.Period.Start,
-                    PeriodEnd = address.Period.End
-                };
-                
-                patient.Address.Add(addressSet);
+                addressLines1[i] = source.Address[i].LineElement[0].Value;
+                addressLines2[i] = source.Address[i].LineElement[1].Value;
+                postalCodes[i] = source.Address[i].PostalCode;
+                cities[i] = source.Address[i].City;
+                countries[i] = source.Address[i].Country;
+                states[i] = source.Address[i].State;
+                periodStarts[i] = source.Address[i].Period.Start;
+                periodEnds[i] = source.Address[i].Period.End;
             }
+
+            patient.AddressLines1 = addressLines1;
+            patient.AddressLines2 = addressLines2;
+            patient.PostalCodes = postalCodes;
+            patient.Cities = cities;
+            patient.Countries = countries;
+            patient.States = states;
+            patient.PeriodStarts = periodStarts;
+            patient.PeriodEnds = periodEnds;
 
             return patient;
         }
@@ -197,28 +211,28 @@ namespace ServerExperiment.Models.FHIR
             resource.Address = new List<Address>();
             List<Address> fhirAddresses = new List<Address>();
 
-            foreach (var address in patient.Address)
+            for (int j = 0; j < patient.Countries.Count; j++)
             {
                 Address fhirAddress = new Address()
                 {
-                    Country = address.Country,
-                    City = address.City,
-                    State = address.State,
-                    PostalCode = address.PostalCode,
+                    Country = patient.Countries[j],
+                    City = patient.Cities[j],
+                    State = patient.States[j],
+                    PostalCode = patient.PostalCodes[j],
                     Line = new[]
                     {
-                        address.AddressLine1,
-                        address.AddressLine2
+                        patient.AddressLines1[j],
+                        patient.AddressLines2[j],
                     },
                     Period = new Period
                     {
-                        Start = address.PeriodStart,
-                        End = address.PeriodEnd
+                        Start = patient.PeriodStarts[j],
+                        End = patient.PeriodEnds[j],
                     }
                 };
 
                 fhirAddresses.Add(fhirAddress);
-            };
+            }
 
             resource.Address = fhirAddresses;
 

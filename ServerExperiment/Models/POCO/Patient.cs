@@ -26,7 +26,14 @@ namespace ServerExperiment.Models
             _firstNames = new List<string>() { "Unknown" };
             _lastNames = new List<string>() { "Unknown2" };
 
-            Address = new List<PatientAddressSet>(); // REMOVE ME LATER
+            _addressLines1 = new List<string>() { "Unknown" };
+            _addressLines2 = new List<string>() { "Unknown" };
+            _postalCodes = new List<string>() { "Unknown" };
+            _cities = new List<string>() { "Unknown" };
+            _countries = new List<string>() { "Unknown" };
+            _states = new List<string>() { "Unknown" };
+            _periodStarts = new List<string>() { "Unknown" };
+            _periodEnds = new List<string>() { "Unknown" };
         }
 
 
@@ -41,7 +48,9 @@ namespace ServerExperiment.Models
         // Logical Identifier
         [Key]
         public int PatientId { get; set; }
+        
         // Patient properties
+        // Patient Name
         // EF DOES NOT SERIALISE/DESERIALISE COLLECTIONS FOR ME, MUST DO IT MYSELF
         private List<string> _firstNames;
         public List<string> FirstNames
@@ -67,15 +76,106 @@ namespace ServerExperiment.Models
             set { _lastNames = value.Split(';').ToList(); }
         }
 
-        public List<PatientAddressSet> Address { get; set; }
+        // Patient Address
+        private List<string> _addressLines1;
+        public List<string> AddressLines1
+        {
+            get { return _addressLines1; }
+            set { _addressLines1 = value; }
+        }
+        public string AddressLines1Serialised
+        {
+            get { return String.Join(";", _addressLines1); }
+            set { _addressLines1 = value.Split(';').ToList(); }
+        }
+        private List<string> _addressLines2;
+        public List<string> AddressLines2
+        {
+            get { return _addressLines2; }
+            set { _addressLines2 = value; }
+        }
+        public string AddressLines2Serialised
+        {
+            get { return String.Join(";", _addressLines2); }
+            set { _addressLines2 = value.Split(';').ToList(); }
+        }
+        private List<string> _postalCodes;
+        public List<string> PostalCodes
+        {
+            get { return _postalCodes; }
+            set { _postalCodes = value; }
+        }
+        public string PostalCodesSerialised
+        {
+            get { return String.Join(";", _postalCodes); }
+            set { _postalCodes = value.Split(';').ToList(); }
+        }
+        private List<string> _cities;
+        public List<string> Cities
+        {
+            get { return _cities; }
+            set { _cities = value; }
+        }
+        public string CitiesSerialised
+        {
+            get { return String.Join(";", _cities); }
+            set { _cities = value.Split(';').ToList(); }
+        }
+        private List<string> _countries;
+        public List<string> Countries
+        {
+            get { return _countries; }
+            set { _countries = value; }
+        }
+        public string CountriesSerialised
+        {
+            get { return String.Join(";", _countries); }
+            set { _countries = value.Split(';').ToList(); }
+        }
+        private List<string> _states;
+        public List<string> States
+        {
+            get { return _states; }
+            set { _states = value; }
+        }
+        public string StatesSerialised
+        {
+            get { return String.Join(";", _states); }
+            set { _states = value.Split(';').ToList(); }
+        }
+        private List<string> _periodStarts;
+        public List<string> PeriodStarts
+        {
+            get { return _periodStarts; }
+            set { _periodStarts = value; }
+        }
+        public string PeriodStartsSerialised
+        {
+            get { return String.Join(";", _periodStarts); }
+            set { _periodStarts = value.Split(';').ToList(); }
+        }
+        private List<string> _periodEnds;
+        public List<string> PeriodEnds
+        {
+            get { return _periodEnds; }
+            set { _periodEnds = value; }
+        }
+        public string PeriodEndsSerialised
+        {
+            get { return String.Join(";", _periodEnds); }
+            set { _periodEnds = value.Split(';').ToList(); }
+        }
 
+        // Patient Birthday/Gender
         public DateTime Birthday { get; set; }
         public GenderCode Gender { get; set; }
 
+        // Patient Contact
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Mobile { get; set; }
 
+        // Patient Bools
         public bool Active { get; set; }
         public bool Deceased { get; set; }
 
