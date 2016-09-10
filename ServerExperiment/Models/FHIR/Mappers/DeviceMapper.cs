@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Hl7.Fhir.Model;
+using static Hl7.Fhir.Model.Device;
+using ServerExperiment.Models.FHIR.Helpers.Device;
 
-namespace ServerExperiment.Models.FHIR
+namespace ServerExperiment.Models.FHIR.Mappers
 {
     public class DeviceMapper
     {
@@ -13,192 +15,95 @@ namespace ServerExperiment.Models.FHIR
         /// </summary>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public static Models.Patient MapResource(Resource resource)
+        public static Models.Device MapResource(Resource resource)
         {
-            var source = resource as Hl7.Fhir.Model.Patient;
+            var source = resource as Hl7.Fhir.Model.Device;
             if (source == null)
             {
-                throw new ArgumentException("Resource in not a HL7 FHIR Patient resouce");
+                throw new ArgumentException("Resource in not a HL7 FHIR Device resouce");
             }
 
-            Models.Patient patient = new Models.Patient();
+            Models.Device device = new Models.Device();
 
-            patient.Active = source.Active ?? true;
-            var deceased = source.Deceased as FhirBoolean;
-            if (deceased != null)
-                patient.Deceased = deceased.Value ?? false;
+            // Device Type
+            device.TypeCode = source.Type.Coding.FirstOrDefault().Code;
+            device.TypeDisplay = source.Type.Coding.FirstOrDefault().Display;
+            device.TypeSystem = source.Type.Coding.FirstOrDefault().System;
 
-            // Patient name
-            patient.FirstName = source.Name[0].Given.FirstOrDefault();
-            patient.LastName = source.Name[0].Family.FirstOrDefault();
-
-            // Patient Contact info
-            var phone = source.Telecom.FirstOrDefault(t => t.System == ContactPoint.ContactPointSystem.Phone && t.Use == ContactPoint.ContactPointUse.Home); // Get contact method t where t is phone and of type home.
-            if (phone != null)
-                patient.Phone = phone.Value;
-
-            var mobile = source.Telecom.FirstOrDefault(t => t.System == ContactPoint.ContactPointSystem.Phone && t.Use == ContactPoint.ContactPointUse.Mobile);
-            if (mobile != null)
-                patient.Mobile = mobile.Value;
-
-            var email = source.Telecom.FirstOrDefault(t => t.System == ContactPoint.ContactPointSystem.Email && t.Use == ContactPoint.ContactPointUse.Home);
-            if (email != null)
-                patient.Email = email.Value;
-            
-            // Patient Gender
-            var gender = source.Gender.GetValueOrDefault();
-            switch (gender)
+            // Device Status
+            var status = source.Status.GetValueOrDefault();
+            switch (status)
             {
-                case AdministrativeGender.Unknown:
-                    patient.Gender = GenderCode.Unknown;
+                case DeviceStatus.Available:
+                    device.Status = Status.available;
                     break;
-                case AdministrativeGender.Female:
-                    patient.Gender = GenderCode.Female;
+                case DeviceStatus.NotAvailable:
+                    device.Status = Status.not_available;
                     break;
-                case AdministrativeGender.Male:
-                    patient.Gender = GenderCode.Male;
-                    break;
-                case AdministrativeGender.Other:
-                    patient.Gender = GenderCode.Undetermined;
-                    break;
-                default:
-                    patient.Gender = GenderCode.Unknown;
+                case DeviceStatus.EnteredInError:
+                    device.Status = Status.entered_in_error;
                     break;
             }
 
-            // Example for extension "nationality"
-            var firstOrDefault = source.Extension.FirstOrDefault(x => x.Url == "http://www.englishclub.com/vocabulary/world-countries-nationality.htm");
-            if (firstOrDefault != null)
-            {
-                var element = firstOrDefault.Value;
-                var nationality = (FhirString)firstOrDefault.Value;
-                patient.Nationality = nationality.Value;
-            }
+            // Device Other details
+            device.Manufacturer = source.Manufacturer;
+            device.Model = source.Model;
+            device.Udi = source.Udi;
+            device.Expiry = source.Expiry;
+            device.LotNumber = source.LotNumber;
+            device.PatientReference = source.Patient.Reference;
 
-            // Patient birthday
-            var birthday = source.BirthDate;
-            patient.Birthday = DateTime.Parse(birthday);
-
-            // Patient Address
-            var addLine1 = source.Address[0].LineElement[0].Value;
-            var addLine2 = source.Address[0].LineElement[1].Value;
-            var city = source.Address[0].City;
-            var district = source.Address[0].District;
-            var state = source.Address[0].State;
-            var postalCode = source.Address[0].PostalCode;
-            var periodStart = source.Address[0].Period.Start;
-            var periodEnd = source.Address[0].Period.End;
-            patient.AddressLine1 = addLine1;
-            patient.AddressLine2 = addLine2;
-            patient.City = city;
-            patient.District = district;
-            patient.State = state;
-            patient.PeriodStart = periodStart;
-            patient.PeriodEnd = periodEnd;
-
-            return patient;
+            return device;
         }
 
         /// <summary>
-        /// Given a Patient POCO, maps the data to a Patient Resource.
+        /// Given a device POCO, maps the data to a device Resource.
         /// </summary>
-        /// <param name="patient"></param>
+        /// <param name="device"></param>
         /// <returns></returns>
-        public static Hl7.Fhir.Model.Patient MapModel(Models.Patient patient)
+        public static Hl7.Fhir.Model.Device MapModel(Models.Device device)
         {
-            if (patient == null)
+            if (device == null)
             {
-                throw new ArgumentNullException("patient");
+                throw new ArgumentNullException("device");
             }
 
-            var resource = new Hl7.Fhir.Model.Patient();
+            var resource = new Hl7.Fhir.Model.Device();
 
-            resource.Id = patient.PatientId.ToString("D");
+            resource.Id = device.DeviceId.ToString("D");
 
-            resource.Active = patient.Active;
-            resource.Deceased = new FhirBoolean(patient.Deceased);
-
-            resource.Name = new List<HumanName>();
-            var name = new HumanName()
+            CodeableConcept deviceType = new CodeableConcept();
+            List<Coding> deviceCodings = new List<Coding>();
+            Coding deviceCoding = new Coding()
             {
-                Family = new[] { patient.LastName },
-                Given = new[] { patient.FirstName },
-                Use = HumanName.NameUse.Official
+                System = device.TypeSystem,
+                Display = device.TypeDisplay,
+                Code = device.TypeCode
             };
-            resource.Name.Add(name);
 
-            resource.BirthDate = patient.Birthday.ToString("s");
+            resource.Type = deviceType;
 
-            switch (patient.Gender)
+            switch (device.Status)
             {
-                case GenderCode.Female:
-                    resource.Gender = AdministrativeGender.Female;
-                    //resource.Gender = new CodeableConcept("http://hl7.org/fhir/v3/AdministrativeGender", "F", "Female");
+                case Status.available:
+                    resource.Status = DeviceStatus.Available;
                     break;
-
-                case GenderCode.Male:
-                    resource.Gender = AdministrativeGender.Male;
-                    //resource.Gender = new CodeableConcept("http://hl7.org/fhir/v3/AdministrativeGender", "M", "Male");
+                case Status.not_available:
+                    resource.Status = DeviceStatus.NotAvailable;
                     break;
-
-                case GenderCode.Undetermined:
-                    resource.Gender = AdministrativeGender.Other;
-                    //resource.Gender = new CodeableConcept("http://hl7.org/fhir/v3/AdministrativeGender", "U", "Undetermined");
-                    break;
-
-                default:
-                    resource.Gender = AdministrativeGender.Unknown;
-                    //resource.Gender = new CodeableConcept("http://hl7.org/fhir/v3/NullFlavor", "UNK", "Unknown");
+                case Status.entered_in_error:
+                    resource.Status = DeviceStatus.EnteredInError;
                     break;
             }
 
-            resource.Telecom = new List<ContactPoint>
-            {
-                new ContactPoint() {
-                    Value = patient.Phone,
-                    System = ContactPoint.ContactPointSystem.Phone,
-                    Use = ContactPoint.ContactPointUse.Home
-                },
-                new ContactPoint() {
-                    Value = patient.Mobile,
-                    System = ContactPoint.ContactPointSystem.Phone,
-                    Use = ContactPoint.ContactPointUse.Mobile
-                },
-                new ContactPoint() {
-                    Value = patient.Email,
-                    System = ContactPoint.ContactPointSystem.Email,
-                    Use = ContactPoint.ContactPointUse.Home
-                },
-            };
+            resource.Manufacturer = device.Manufacturer;
+            resource.Model = device.Model;
+            resource.Expiry = device.Expiry;
+            resource.Udi = device.Udi;
+            resource.LotNumber = device.LotNumber;
 
-            resource.Address = new List<Address>
-            {
-                new Address()
-                {
-                    Country = patient.Country,
-                    City = patient.City,
-                    District = patient.District,
-                    State = patient.State,
-                    PostalCode = patient.PostalCode,
-                    Line = new[]
-                    {
-                        patient.AddressLine1,
-                        patient.AddressLine2
-                    },
-                    Period = new Period
-                    {
-                        Start = patient.PeriodStart,
-                        End = patient.PeriodEnd
-                    }
-                }
-            };
-
-            // Make use of extensions ...
-            //
-            resource.Extension = new List<Extension>(1);
-            resource.Extension.Add(new Extension("http://www.englishclub.com/vocabulary/world-countries-nationality.htm",
-                                                    new FhirString(patient.Nationality)
-                                                    ));
+            resource.Patient = new ResourceReference();
+            resource.Patient.Reference = device.PatientReference;
 
             return resource;
         }

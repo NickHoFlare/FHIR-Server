@@ -8,8 +8,9 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using ServerExperiment.Models;
 using Hl7.Fhir.Serialization;
-using ServerExperiment.Models.FHIR;
+using ServerExperiment.Models.FHIR.Mappers;
 using System.Text;
+using ServerExperiment.Controllers.FhirControllers;
 
 namespace ServerExperiment.Controllers
 {
@@ -40,9 +41,9 @@ namespace ServerExperiment.Controllers
             }
 
             Hl7.Fhir.Model.Patient fhirPatient = PatientMapper.MapModel(patient);
-            string fixedFormat = FixMimeString(_format);
+            string fixedFormat = ControllerUtils.FixMimeString(_format);
 
-            string payload = Serialize(fhirPatient, fixedFormat, _summary);
+            string payload = ControllerUtils.Serialize(fhirPatient, fixedFormat, _summary);
 
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
             return message;
@@ -136,36 +137,6 @@ namespace ServerExperiment.Controllers
         private bool PatientExists(int id)
         {
             return db.Patients.Count(e => e.PatientId == id) > 0;
-        }
-
-        private string Serialize(Hl7.Fhir.Model.Patient fhirPatient, string mimeFormat, bool summary)
-        {
-            string payload = string.Empty;
-
-            if (mimeFormat.IndexOf("JSON", StringComparison.InvariantCultureIgnoreCase) >= 0)
-            {
-                payload = FhirSerializer.SerializeResourceToJson(fhirPatient, summary);
-            }
-            else
-            {
-                payload = FhirSerializer.SerializeResourceToXml(fhirPatient, summary);
-            }
-
-            return payload;
-        }
-
-        private string FixMimeString(string mimeFormat)
-        {
-            if (mimeFormat.IndexOf("JSON", StringComparison.InvariantCultureIgnoreCase) >= 0)
-            {
-                mimeFormat = "application/JSON+FHIR";
-            }
-            else
-            {
-                mimeFormat = "application/XML+FHIR";
-            }
-
-            return mimeFormat;
         }
     }
 }

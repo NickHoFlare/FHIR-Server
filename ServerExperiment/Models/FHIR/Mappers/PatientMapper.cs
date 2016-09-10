@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Hl7.Fhir.Model;
+using ServerExperiment.Models.FHIR.Helpers.Patient;
 
-namespace ServerExperiment.Models.FHIR
+namespace ServerExperiment.Models.FHIR.Mappers
 {
     public class PatientMapper
     {

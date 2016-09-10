@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace ServerExperiment.Models
+namespace ServerExperiment.Models.FHIR.Helpers.Patient
 {
     public enum GenderCode
     {

@@ -32,6 +32,11 @@ namespace ServerExperiment
                 defaults: new { id = RouteParameter.Optional }
             );
 
+            config.Routes.MapHttpRoute(
+                name: "SpecificDevice",
+                routeTemplate: "fhir/Device/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
         }
     }
 }
