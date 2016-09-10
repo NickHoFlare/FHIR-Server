@@ -35,6 +35,7 @@ namespace ServerExperiment.Models
         public string TypeSystem { get; set; }
         public string TypeCode { get; set; }
         public string TypeDisplay { get; set; }
+        public string TypeText { get; set; }
         
         public Status Status { get; set; }
         public string Manufacturer { get; set; }

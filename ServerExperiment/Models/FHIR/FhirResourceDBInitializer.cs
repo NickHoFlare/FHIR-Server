@@ -1,4 +1,5 @@
-﻿using ServerExperiment.Models.FHIR.Helpers.Patient;
+﻿using ServerExperiment.Models.FHIR.Helpers.Device;
+using ServerExperiment.Models.FHIR.Helpers.Patient;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -11,6 +12,7 @@ namespace ServerExperiment.Models
     {
         protected override void Seed(FhirResourceContext context)
         {
+            // Seed Patient data
             IList<Patient> defaultPatients = new List<Patient>();
 
             string firstNames = "Nicholas;DingJin";
@@ -59,6 +61,31 @@ namespace ServerExperiment.Models
 
             foreach (Patient patient in defaultPatients)
                 context.Patients.Add(patient);
+
+            // Seed Device data
+            IList<Device> defaultDevices = new List<Device>();
+
+            defaultDevices.Add(new Device());
+            defaultDevices.Add(new Device()
+            {
+                TypeSystem = "http://snomed.info/sct",
+                TypeCode = "86184003",
+                TypeDisplay = "Electrocardiographic monitor and recorder",
+                Status = Status.available,
+                Manufacturer = "ACME",
+                Model = "D3AD-B33F",
+                PatientReference = "Patient/2"
+            });
+            defaultDevices.Add(new Device()
+            {
+                TypeText = "Spirometer",
+                Status = Status.available,
+                Manufacturer = "ACME",
+                Model = "D3AD-B33F",
+            });
+
+            foreach (Device device in defaultDevices)
+                context.Devices.Add(device);
 
             base.Seed(context);
         }

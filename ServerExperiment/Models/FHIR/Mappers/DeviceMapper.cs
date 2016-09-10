@@ -29,6 +29,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             device.TypeCode = source.Type.Coding.FirstOrDefault().Code;
             device.TypeDisplay = source.Type.Coding.FirstOrDefault().Display;
             device.TypeSystem = source.Type.Coding.FirstOrDefault().System;
+            device.TypeText = source.Type.Text;
 
             // Device Status
             var status = source.Status.GetValueOrDefault();
@@ -72,17 +73,29 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             resource.Id = device.DeviceId.ToString("D");
 
-            CodeableConcept deviceType = new CodeableConcept();
-            List<Coding> deviceCodings = new List<Coding>();
-            Coding deviceCoding = new Coding()
+            // Device Type
+            if (device.TypeCode != null || device.TypeDisplay != null || device.TypeSystem != null || device.TypeText != null)
             {
-                System = device.TypeSystem,
-                Display = device.TypeDisplay,
-                Code = device.TypeCode
-            };
+                CodeableConcept deviceType = new CodeableConcept();
+                List<Coding> deviceCodings = new List<Coding>();
 
-            resource.Type = deviceType;
+                if (device.TypeCode != null || device.TypeDisplay != null || device.TypeSystem != null)
+                {
+                    Coding deviceCoding = new Coding()
+                    {
+                        System = device.TypeSystem,
+                        Display = device.TypeDisplay,
+                        Code = device.TypeCode
+                    };
+                    deviceCodings.Add(deviceCoding);
+                    deviceType.Coding = deviceCodings;
+                }
+                deviceType.Text = device.TypeText;
+                
+                resource.Type = deviceType;
+            }
 
+            // Device Status
             switch (device.Status)
             {
                 case Status.available:
@@ -94,16 +107,24 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 case Status.entered_in_error:
                     resource.Status = DeviceStatus.EnteredInError;
                     break;
+                default:
+                    resource.Status = DeviceStatus.EnteredInError;
+                    break;
             }
 
+            // Device Other details
             resource.Manufacturer = device.Manufacturer;
             resource.Model = device.Model;
             resource.Expiry = device.Expiry;
             resource.Udi = device.Udi;
             resource.LotNumber = device.LotNumber;
 
-            resource.Patient = new ResourceReference();
-            resource.Patient.Reference = device.PatientReference;
+            // Device Reference to Patient
+            if (device.PatientReference != null)
+            {
+                resource.Patient = new ResourceReference();
+                resource.Patient.Reference = device.PatientReference;
+            }
 
             return resource;
         }
