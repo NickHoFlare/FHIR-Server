@@ -62,7 +62,7 @@ namespace ServerExperiment.Models
         public Instant Issued { get; set; }
 
         // Applicable to both individual ValueSet and Componentised Valuesets.
-        public List<ValueSet> Values { get; set; }
+        public List<ObservationValueSet> Values { get; set; }
 
         public CodeableConcept Interpretation { get; set; }
 

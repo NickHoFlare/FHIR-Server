@@ -23,14 +23,23 @@ namespace ServerExperiment.Models.FHIR
 
             Models.Patient patient = new Models.Patient();
 
-            patient.Active = source.Active ?? true;
+            patient.Active = source.Active ?? true; // Set to value of source.Active. if null, set to true.
             var deceased = source.Deceased as FhirBoolean;
             if (deceased != null)
                 patient.Deceased = deceased.Value ?? false;
 
-            // Patient name
-            patient.FirstName = source.Name[0].Given.FirstOrDefault();
-            patient.LastName = source.Name[0].Family.FirstOrDefault();
+            // Patient names
+            List<string> firstNames = new List<string>();
+            List<string> lastNames = new List<string>();
+            
+            for (int i = 0; i < source.Name.Count; i++)
+            {
+                firstNames[i] = source.Name[i].Given.FirstOrDefault();
+                lastNames[i] = source.Name[i].Family.FirstOrDefault();
+            }
+
+            patient.FirstNames = firstNames;
+            patient.LastNames = lastNames;
 
             // Patient Contact info
             var phone = source.Telecom.FirstOrDefault(t => t.System == ContactPoint.ContactPointSystem.Phone && t.Use == ContactPoint.ContactPointUse.Home); // Get contact method t where t is phone and of type home.
@@ -80,21 +89,21 @@ namespace ServerExperiment.Models.FHIR
             patient.Birthday = DateTime.Parse(birthday);
 
             // Patient Address
-            var addLine1 = source.Address[0].LineElement[0].Value;
-            var addLine2 = source.Address[0].LineElement[1].Value;
-            var city = source.Address[0].City;
-            var district = source.Address[0].District;
-            var state = source.Address[0].State;
-            var postalCode = source.Address[0].PostalCode;
-            var periodStart = source.Address[0].Period.Start;
-            var periodEnd = source.Address[0].Period.End;
-            patient.AddressLine1 = addLine1;
-            patient.AddressLine2 = addLine2;
-            patient.City = city;
-            patient.District = district;
-            patient.State = state;
-            patient.PeriodStart = periodStart;
-            patient.PeriodEnd = periodEnd;
+            foreach (var address in source.Address)
+            {
+                PatientAddressSet addressSet = new PatientAddressSet()
+                {
+                    AddressLine1 = address.LineElement[0].Value,
+                    AddressLine2 = address.LineElement[1].Value,
+                    City = address.City,
+                    State = address.State,
+                    PostalCode = address.PostalCode,
+                    PeriodStart = address.Period.Start,
+                    PeriodEnd = address.Period.End
+                };
+                
+                patient.Address.Add(addressSet);
+            }
 
             return patient;
         }
@@ -113,22 +122,34 @@ namespace ServerExperiment.Models.FHIR
 
             var resource = new Hl7.Fhir.Model.Patient();
 
-            resource.Id = patient.PatientId.ToString("D");
+            resource.Id = patient.PatientId.ToString("D"); // wtf does this line do
 
+            // Patient bools
             resource.Active = patient.Active;
             resource.Deceased = new FhirBoolean(patient.Deceased);
 
+            // Patient Names
             resource.Name = new List<HumanName>();
-            var name = new HumanName()
-            {
-                Family = new[] { patient.LastName },
-                Given = new[] { patient.FirstName },
-                Use = HumanName.NameUse.Official
-            };
-            resource.Name.Add(name);
+            List<HumanName> fhirNames = new List<HumanName>();
 
+            for (int j = 0; j < patient.FirstNames.Count; j++)
+            {
+                HumanName fhirName = new HumanName()
+                {
+                    Family = new[] { patient.FirstNames[j] },
+                    Given = new[] { patient.LastNames[j] },
+                    Use = HumanName.NameUse.Official
+                };
+
+                fhirNames.Add(fhirName);
+            }
+
+            resource.Name = fhirNames;
+
+            // Patient Birthday
             resource.BirthDate = patient.Birthday.ToString("s");
 
+            // Patient Gender
             switch (patient.Gender)
             {
                 case GenderCode.Female:
@@ -152,6 +173,7 @@ namespace ServerExperiment.Models.FHIR
                     break;
             }
 
+            // Patient Telecom
             resource.Telecom = new List<ContactPoint>
             {
                 new ContactPoint() {
@@ -171,27 +193,34 @@ namespace ServerExperiment.Models.FHIR
                 },
             };
 
-            resource.Address = new List<Address>
+            // Patient Address
+            resource.Address = new List<Address>();
+            List<Address> fhirAddresses = new List<Address>();
+
+            foreach (var address in patient.Address)
             {
-                new Address()
+                Address fhirAddress = new Address()
                 {
-                    Country = patient.Country,
-                    City = patient.City,
-                    District = patient.District,
-                    State = patient.State,
-                    PostalCode = patient.PostalCode,
+                    Country = address.Country,
+                    City = address.City,
+                    State = address.State,
+                    PostalCode = address.PostalCode,
                     Line = new[]
                     {
-                        patient.AddressLine1,
-                        patient.AddressLine2
+                        address.AddressLine1,
+                        address.AddressLine2
                     },
                     Period = new Period
                     {
-                        Start = patient.PeriodStart,
-                        End = patient.PeriodEnd
+                        Start = address.PeriodStart,
+                        End = address.PeriodEnd
                     }
-                }
+                };
+
+                fhirAddresses.Add(fhirAddress);
             };
+
+            resource.Address = fhirAddresses;
 
             // Make use of extensions ...
             //

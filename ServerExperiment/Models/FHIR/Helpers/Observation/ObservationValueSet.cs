@@ -6,7 +6,7 @@ using System.Web;
 
 namespace ServerExperiment.Models
 {
-    public struct ValueSet
+    public struct ObservationValueSet
     {
         public CodeableConcept ComponentCode { get; set; }
         public Quantity ValueQuantity { get; set; }

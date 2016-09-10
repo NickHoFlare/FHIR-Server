@@ -21,5 +21,7 @@ namespace ServerExperiment.Models
         }
 
         public System.Data.Entity.DbSet<ServerExperiment.Models.Patient> Patients { get; set; }
+        //public System.Data.Entity.DbSet<ServerExperiment.Models.Device> Devices { get; set; }
+        //public System.Data.Entity.DbSet<ServerExperiment.Models.Observation> Observations { get; set; }
     }
 }

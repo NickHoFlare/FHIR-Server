@@ -249,10 +249,11 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\FHIR\FhirResourceContext.cs" />
     <Compile Include="Models\FHIR\FhirResourceDBInitializer.cs" />
-    <Compile Include="Models\FHIR\ValueSet.cs" />
-    <Compile Include="Models\FHIR\GenderCode.cs" />
-    <Compile Include="Models\FHIR\DeviceMapper.cs" />
-    <Compile Include="Models\FHIR\PatientMapper.cs" />
+    <Compile Include="Models\FHIR\Helpers\Observation\ObservationValueSet.cs" />
+    <Compile Include="Models\FHIR\Helpers\Patient\GenderCode.cs" />
+    <Compile Include="Models\FHIR\Helpers\Patient\PatientAddressSet.cs" />
+    <Compile Include="Models\FHIR\Helpers\Patient\PatientNameSet.cs" />
+    <Compile Include="Models\FHIR\Mappers\PatientMapper.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\POCO\Observation.cs" />
     <Compile Include="Models\POCO\Device.cs" />
@@ -307,7 +308,6 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
-    <Content Include="Utils\FhirPatientXml.xml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -328,6 +328,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\FHIR\Helpers\Device\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

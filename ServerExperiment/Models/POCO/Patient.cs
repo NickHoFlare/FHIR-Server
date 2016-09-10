@@ -16,48 +16,17 @@ namespace ServerExperiment.Models
 
             PatientId = 0;
             Version = 0;
-            LastName = "Unknown";
             Birthday = DateTime.UtcNow;
             Gender = GenderCode.Unknown;
             Active = true;
             Deceased = false;
-        }
 
-        public Patient(Patient patient)
-        {
-            RecordNo = 0;
+            FirstNamesSerialised = "Unknown";
 
-            Action = patient.Action;
-            Timestamp = patient.Timestamp;
-            Version = patient.Version;
-            IsDeleted = patient.IsDeleted;
+            _firstNames = new List<string>() { "Unknown" };
+            _lastNames = new List<string>() { "Unknown2" };
 
-            // Logical Identifier
-            PatientId = patient.PatientId;
-
-            // Patient properties
-            FirstName = patient.FirstName;
-            LastName = patient.LastName;
-
-            Birthday = patient.Birthday;
-            Gender = patient.Gender;
-
-            Email = patient.Email;
-            Phone = patient.Phone;
-            Mobile = patient.Mobile;
-
-            AddressLine1 = patient.AddressLine1;
-            AddressLine2 = patient.AddressLine2;
-            PostalCode = patient.PostalCode;
-            City = patient.City;
-            Country = patient.Country;
-            District = patient.District;
-            State = patient.State;
-            PeriodStart = patient.PeriodStart;
-            PeriodEnd = patient.PeriodEnd;
-
-            Active = patient.Active;
-            Deceased = patient.Deceased;
+            Address = new List<PatientAddressSet>(); // REMOVE ME LATER
         }
 
 
@@ -72,11 +41,33 @@ namespace ServerExperiment.Models
         // Logical Identifier
         [Key]
         public int PatientId { get; set; }
-
         // Patient properties
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
+        // EF DOES NOT SERIALISE/DESERIALISE COLLECTIONS FOR ME, MUST DO IT MYSELF
+        private List<string> _firstNames;
+        public List<string> FirstNames
+        {
+            get { return _firstNames; }
+            set { _firstNames = value; }
+        }
+        public string FirstNamesSerialised
+        {
+            get { return String.Join(";", _firstNames); }
+            set { _firstNames = value.Split(';').ToList(); }
+        }
+
+        private List<string> _lastNames;
+        public List<string> LastNames
+        {
+            get { return _lastNames; }
+            set { _lastNames = value; }
+        }
+        public string LastNamesSerialised
+        {
+            get { return String.Join(";", _lastNames); }
+            set { _lastNames = value.Split(';').ToList(); }
+        }
+
+        public List<PatientAddressSet> Address { get; set; }
 
         public DateTime Birthday { get; set; }
         public GenderCode Gender { get; set; }
@@ -84,16 +75,6 @@ namespace ServerExperiment.Models
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Mobile { get; set; }
-
-        public string AddressLine1 { get; set; }
-        public string AddressLine2 { get; set; }
-        public string PostalCode { get; set; }
-        public string City { get; set; }
-        public string Country { get; set; }
-        public string District { get; set; }
-        public string State { get; set; }
-        public string PeriodStart { get; set; }
-        public string PeriodEnd { get; set; }
 
         public bool Active { get; set; }
         public bool Deceased { get; set; }
