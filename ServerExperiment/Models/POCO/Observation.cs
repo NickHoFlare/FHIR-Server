@@ -19,6 +19,35 @@ namespace ServerExperiment.Models
 
             ObservationId = 0;
             Version = 0;
+
+            _categoryCode = new List<string>();
+            _categoryDisplay = new List<string>();
+            _categorySystem = new List<string>();
+            _codeCode = new List<string>();
+            _codeDisplay = new List<string>();
+            _codeSystem = new List<string>();
+            _componentCodeCode = new List<string>();
+            _componentCodeDisplay = new List<string>();
+            _componentCodeSystem = new List<string>();
+            _performerReferences = new List<string>();
+            _valueCode = new List<string>();
+            _valueDisplay = new List<string>();
+            _valuePeriodEnd = new List<DateTime>();
+            _valuePeriodStart = new List<DateTime>();
+            _valueQuantityCode = new List<string>();
+            _valueQuantitySystem = new List<string>();
+            _valueQuantityUnit = new List<string>();
+            _valueQuantityValue = new List<decimal>();
+            _ValueSampledDataData = new List<string>();
+            _valueSampledDataDimensions = new List<int>();
+            _valueSampledDataOriginCode = new List<string>();
+            _valueSampledDataOriginSystem = new List<string>();
+            _ValueSampledDataOriginUnit = new List<string>();
+            _ValueSampledDataOriginValue = new List<decimal>();
+            _valueSampledDataPeriod = new List<decimal>();
+            _valueString = new List<string>();
+            _valueSystem = new List<string>();
+            _ValueText = new List<string>();
         }
 
         // Each Record is immutable, in case of updates we create a new record and 
@@ -34,7 +63,7 @@ namespace ServerExperiment.Models
         public int ObservationId { get; set; }
 
         // Observation properties
-        public Status Status { get; set; }
+        public ObsStatus Status { get; set; }
 
         // Observation Category 
         private List<string> _categorySystem;
@@ -136,7 +165,7 @@ namespace ServerExperiment.Models
         public string InterpretationText { get; set; }
 
         // Observation comments
-        public string comments { get; set; }
+        public string Comments { get; set; }
 
         // Site of Body where Observation was made
         public string BodySiteSystem { get; set; }

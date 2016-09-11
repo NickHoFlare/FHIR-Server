@@ -6,7 +6,7 @@ using System.Web;
 namespace ServerExperiment.Models.FHIR.Helpers.Observation
 {
     // registered | preliminary | final | amended |
-    public enum Status
+    public enum ObsStatus
     {
         registered,
         preliminary,

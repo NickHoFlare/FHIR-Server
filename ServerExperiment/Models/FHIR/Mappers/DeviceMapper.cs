@@ -36,16 +36,16 @@ namespace ServerExperiment.Models.FHIR.Mappers
             switch (status)
             {
                 case DeviceStatus.Available:
-                    device.Status = Status.available;
+                    device.Status = DevStatus.available;
                     break;
                 case DeviceStatus.NotAvailable:
-                    device.Status = Status.not_available;
+                    device.Status = DevStatus.not_available;
                     break;
                 case DeviceStatus.EnteredInError:
-                    device.Status = Status.entered_in_error;
+                    device.Status = DevStatus.entered_in_error;
                     break;
                 default:
-                    device.Status = Status.entered_in_error;
+                    device.Status = DevStatus.entered_in_error;
                     break;
             }
 
@@ -101,13 +101,13 @@ namespace ServerExperiment.Models.FHIR.Mappers
             // Device Status
             switch (device.Status)
             {
-                case Status.available:
+                case DevStatus.available:
                     resource.Status = DeviceStatus.Available;
                     break;
-                case Status.not_available:
+                case DevStatus.not_available:
                     resource.Status = DeviceStatus.NotAvailable;
                     break;
-                case Status.entered_in_error:
+                case DevStatus.entered_in_error:
                     resource.Status = DeviceStatus.EnteredInError;
                     break;
                 default:

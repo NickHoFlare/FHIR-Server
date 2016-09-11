@@ -30,28 +30,28 @@ namespace ServerExperiment.Models.FHIR.Mappers
             switch (status)
             {
                 case ObservationStatus.Registered:
-                    observation.Status = Status.registered;
+                    observation.Status = ObsStatus.registered;
                     break;
                 case ObservationStatus.Preliminary:
-                    observation.Status = Status.preliminary;
+                    observation.Status = ObsStatus.preliminary;
                     break;
                 case ObservationStatus.Final:
-                    observation.Status = Status.final;
+                    observation.Status = ObsStatus.final;
                     break;
                 case ObservationStatus.Amended:
-                    observation.Status = Status.amended;
+                    observation.Status = ObsStatus.amended;
                     break;
                 case ObservationStatus.Cancelled:
-                    observation.Status = Status.cancelled;
+                    observation.Status = ObsStatus.cancelled;
                     break;
                 case ObservationStatus.Unknown:
-                    observation.Status = Status.unknown;
+                    observation.Status = ObsStatus.unknown;
                     break;
                 case ObservationStatus.EnteredInError:
-                    observation.Status = Status.entered_in_error;
+                    observation.Status = ObsStatus.entered_in_error;
                     break;
                 default:
-                    observation.Status = Status.entered_in_error;
+                    observation.Status = ObsStatus.entered_in_error;
                     break;
             }
 
@@ -104,7 +104,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             observation.InterpretationText = source.Interpretation.Text;
 
             // Observation Comments
-            observation.comments = source.Comments;
+            observation.Comments = source.Comments;
 
             // Site of Body where Observation was made
             observation.BodySiteCode = source.BodySite.Coding.FirstOrDefault().Code;
@@ -227,25 +227,25 @@ namespace ServerExperiment.Models.FHIR.Mappers
             // Observation Status
             switch (observation.Status)
             {
-                case Status.amended:
+                case ObsStatus.amended:
                     resource.Status = ObservationStatus.Amended;
                     break;
-                case Status.cancelled:
+                case ObsStatus.cancelled:
                     resource.Status = ObservationStatus.Cancelled;
                     break;
-                case Status.entered_in_error:
+                case ObsStatus.entered_in_error:
                     resource.Status = ObservationStatus.EnteredInError;
                     break;
-                case Status.final:
+                case ObsStatus.final:
                     resource.Status = ObservationStatus.Final;
                     break;
-                case Status.preliminary:
+                case ObsStatus.preliminary:
                     resource.Status = ObservationStatus.Preliminary;
                     break;
-                case Status.registered:
+                case ObsStatus.registered:
                     resource.Status = ObservationStatus.Registered;
                     break;
-                case Status.unknown:
+                case ObsStatus.unknown:
                     resource.Status = ObservationStatus.Unknown;
                     break;
                 default:
@@ -344,6 +344,53 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             resource.Issued = observation.Issued;
+
+            // Observation Comments
+            resource.Comments = observation.Comments;
+
+            // Site of Body where Observation was made
+            if (observation.BodySiteCode != null || observation.BodySiteDisplay != null || observation.BodySiteSystem != null || observation.BodySiteText != null)
+            {
+                CodeableConcept observationBodySite = new CodeableConcept();
+                List<Coding> observationCodings = new List<Coding>();
+
+                if (observation.BodySiteCode != null || observation.BodySiteDisplay != null || observation.BodySiteSystem != null)
+                {
+                    Coding observationCoding = new Coding()
+                    {
+                        System = observation.BodySiteSystem,
+                        Display = observation.BodySiteDisplay,
+                        Code = observation.BodySiteCode
+                    };
+                    observationCodings.Add(observationCoding);
+                    observationBodySite.Coding = observationCodings;
+                }
+                observationBodySite.Text = observation.BodySiteText;
+
+                resource.BodySite = observationBodySite;
+            }
+
+            // Observation Interpretation
+            if (observation.InterpretationCode != null || observation.InterpretationDisplay != null || observation.InterpretationSystem != null || observation.InterpretationText != null)
+            {
+                CodeableConcept observationInterpretation = new CodeableConcept();
+                List<Coding> observationCodings = new List<Coding>();
+
+                if (observation.InterpretationCode != null || observation.InterpretationDisplay != null || observation.InterpretationSystem != null)
+                {
+                    Coding observationCoding = new Coding()
+                    {
+                        System = observation.InterpretationSystem,
+                        Display = observation.InterpretationDisplay,
+                        Code = observation.InterpretationCode
+                    };
+                    observationCodings.Add(observationCoding);
+                    observationInterpretation.Coding = observationCodings;
+                }
+                observationInterpretation.Text = observation.InterpretationText;
+
+                resource.Interpretation = observationInterpretation;
+            }
 
             // Observation Values
             // Values are componentised

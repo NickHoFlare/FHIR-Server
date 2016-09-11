@@ -1,4 +1,5 @@
 ﻿using ServerExperiment.Models.FHIR.Helpers.Device;
+using ServerExperiment.Models.FHIR.Helpers.Observation;
 using ServerExperiment.Models.FHIR.Helpers.Patient;
 using System;
 using System.Collections.Generic;
@@ -73,7 +74,7 @@ namespace ServerExperiment.Models
                 TypeSystem = "http://snomed.info/sct",
                 TypeCode = "86184003",
                 TypeDisplay = "Electrocardiographic monitor and recorder",
-                Status = Status.available,
+                Status = DevStatus.available,
                 Manufacturer = "ACME",
                 Model = "D3AD-B33F",
                 PatientReference = "Patient/2"
@@ -81,13 +82,55 @@ namespace ServerExperiment.Models
             defaultDevices.Add(new Device()
             {
                 TypeText = "Spirometer",
-                Status = Status.available,
+                Status = DevStatus.available,
                 Manufacturer = "ACME",
                 Model = "D3AD-B33F",
             });
 
             foreach (Device device in defaultDevices)
                 context.Devices.Add(device);
+
+            // Seed Observation data
+            IList<Observation> defaultObservation = new List<Observation>();
+
+            defaultObservation.Add(new Observation());
+            defaultObservation.Add(new Observation()
+            {
+                Status = ObsStatus.registered,
+                CategoryCodeSerialised = "12345678",
+                CategorySystemSerialised = "http://acme.org/sct",
+                CategoryDisplaySerialised = "Blood Pressure",
+                CategoryText = "Blood P.",
+
+                CodeCodeSerialised = "55284-4",
+                CodeDisplaySerialised = "Blood pressure systolic &amp; diastolic",
+                CodeSystemSerialised = "http://loinc.org",
+                CodeText = "Some Text",
+
+                PatientReference = "Patient/3",
+                PerformerReferencesSerialised = "Patient/3",
+
+                EffectiveDateTime = DateTime.Now,
+                Issued = DateTime.Now,
+
+                ValueQuantityValueSerialised = "107",
+                ValueQuantityUnitSerialised = "mm[Hg]",
+
+                Comments = "A Comment",
+
+                BodySiteCode = "368209003",
+                BodySiteDisplay = "Right Arm",
+                BodySiteSystem = "http://acme.org/sct",
+                BodySiteText = "Some Text",
+
+                InterpretationCode = "L",
+                InterpretationDisplay = "Below low normal",
+                InterpretationSystem = "http://hl7.org/fhir/v2/0078",
+                InterpretationText = "low"
+            });
+
+            foreach (Observation observation in defaultObservation)
+                context.Observations.Add(observation);
 
             base.Seed(context);
         }

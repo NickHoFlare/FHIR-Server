@@ -241,6 +241,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\FhirControllers\ControllerUtils.cs" />
     <Compile Include="Controllers\FhirControllers\DeviceController.cs" />
+    <Compile Include="Controllers\FhirControllers\ObservationController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\FhirControllers\PatientController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
@@ -251,11 +252,13 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\FHIR\FhirResourceContext.cs" />
     <Compile Include="Models\FHIR\FhirResourceDBInitializer.cs" />
-    <Compile Include="Models\FHIR\Helpers\Device\Status.cs" />
+    <Compile Include="Models\FHIR\Helpers\Device\DevStatus.cs" />
     <Compile Include="Models\FHIR\Helpers\Observation\ObservationValueSet.cs" />
+    <Compile Include="Models\FHIR\Helpers\Observation\ObsStatus.cs" />
     <Compile Include="Models\FHIR\Helpers\Patient\GenderCode.cs" />
     <Compile Include="Models\FHIR\Helpers\Patient\PatientAddressSet.cs" />
     <Compile Include="Models\FHIR\Helpers\Patient\PatientNameSet.cs" />
+    <Compile Include="Models\FHIR\Mappers\ObservationMapper.cs" />
     <Compile Include="Models\FHIR\Mappers\DeviceMapper.cs" />
     <Compile Include="Models\FHIR\Mappers\PatientMapper.cs" />
     <Compile Include="Models\IdentityModels.cs" />

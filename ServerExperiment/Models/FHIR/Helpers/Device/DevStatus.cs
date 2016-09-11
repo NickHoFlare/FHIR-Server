@@ -6,7 +6,7 @@ using System.Web;
 namespace ServerExperiment.Models.FHIR.Helpers.Device
 {
     // available | not-available | entered-in-error
-    public enum Status
+    public enum DevStatus
     {
         available,
         not_available,

@@ -37,7 +37,7 @@ namespace ServerExperiment.Models
         public string TypeDisplay { get; set; }
         public string TypeText { get; set; }
         
-        public Status Status { get; set; }
+        public DevStatus Status { get; set; }
         public string Manufacturer { get; set; }
         public string Model { get; set; }
         public string Expiry { get; set; }
