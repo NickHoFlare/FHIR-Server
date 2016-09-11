@@ -21,20 +21,18 @@ namespace ServerExperiment.Models
             Gender = GenderCode.Unknown;
             Active = true;
             Deceased = false;
+            
+            _firstNames = new List<string>();
+            _lastNames = new List<string>();
 
-            FirstNamesSerialised = "Unknown";
-
-            _firstNames = new List<string>() { "Unknown" };
-            _lastNames = new List<string>() { "Unknown2" };
-
-            _addressLines1 = new List<string>() { "Unknown" };
-            _addressLines2 = new List<string>() { "Unknown" };
-            _postalCodes = new List<string>() { "Unknown" };
-            _cities = new List<string>() { "Unknown" };
-            _countries = new List<string>() { "Unknown" };
-            _states = new List<string>() { "Unknown" };
-            _periodStarts = new List<string>() { "Unknown" };
-            _periodEnds = new List<string>() { "Unknown" };
+            _addressLines1 = new List<string>();
+            _addressLines2 = new List<string>();
+            _postalCodes = new List<string>();
+            _cities = new List<string>();
+            _countries = new List<string>();
+            _states = new List<string>();
+            _periodStarts = new List<string>();
+            _periodEnds = new List<string>();
         }
 
 

@@ -54,6 +54,8 @@ namespace ServerExperiment.Models
                 FirstNamesSerialised = firstNames,
                 LastNamesSerialised = lastNames,
                 Birthday = DateTime.Parse("22/03/1991"),
+                Phone = "12345678",
+                Email = "email@email.com",
                 Gender = GenderCode.Male,
                 Active = true,
                 Deceased = false

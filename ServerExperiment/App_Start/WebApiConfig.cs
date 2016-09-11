@@ -37,6 +37,12 @@ namespace ServerExperiment
                 routeTemplate: "fhir/Device/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            config.Routes.MapHttpRoute(
+                name: "SpecificObservation",
+                routeTemplate: "fhir/Observation/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
         }
     }
 }

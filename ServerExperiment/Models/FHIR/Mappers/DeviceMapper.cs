@@ -44,6 +44,9 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 case DeviceStatus.EnteredInError:
                     device.Status = Status.entered_in_error;
                     break;
+                default:
+                    device.Status = Status.entered_in_error;
+                    break;
             }
 
             // Device Other details
