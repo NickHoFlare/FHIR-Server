@@ -103,18 +103,60 @@ namespace ServerExperiment.Models
                 CategoryText = "Blood P.",
 
                 CodeCodeSerialised = "55284-4",
-                CodeDisplaySerialised = "Blood pressure systolic &amp; diastolic",
+                CodeDisplaySerialised = "Blood pressure systolic & diastolic",
                 CodeSystemSerialised = "http://loinc.org",
                 CodeText = "Some Text",
 
                 PatientReference = "Patient/3",
                 PerformerReferencesSerialised = "Patient/3",
+                DeviceReference = "Device/2",
 
-                //EffectiveDateTime = DateTime.Now,
-                //Issued = DateTime.Now,
+                EffectiveDateTime = DateTime.Now,
+                Issued = DateTime.Now,
 
                 ValueQuantityValueSerialised = "107",
                 ValueQuantityUnitSerialised = "mm[Hg]",
+
+                Comments = "A Comment",
+
+                BodySiteCode = "368209003",
+                BodySiteDisplay = "Right Arm",
+                BodySiteSystem = "http://acme.org/sct",
+                BodySiteText = "Some Text",
+
+                InterpretationCode = "L",
+                InterpretationDisplay = "Below low normal",
+                InterpretationSystem = "http://hl7.org/fhir/v2/0078",
+                InterpretationText = "low"
+            });
+            defaultObservation.Add(new Observation()
+            {
+                Status = ObsStatus.registered,
+
+                CodeCodeSerialised = "55284-4",
+                CodeDisplaySerialised = "Blood pressure systolic & diastolic",
+                CodeSystemSerialised = "http://loinc.org",
+                CodeText = "Some Text",
+
+                PatientReference = "Patient/3",
+                PerformerReferencesSerialised = "Patient/3",
+                DeviceReference = "Device/3",
+
+                EffectivePeriodStart = DateTime.UtcNow,
+                EffectivePeriodEnd = DateTime.UtcNow,
+                Issued = DateTime.Now,
+
+                ComponentCodeCodeSerialised = "1A2B3C;4A5B6C",
+                ComponentCodeDisplaySerialised = "Component1;Component2",
+                ComponentCodeSystemSerialised = "http://acme.org/sct;http://acme.org/sct",
+
+                ValueSampledDataOriginCodeSerialised = "1H-5G;2H-5G",
+                ValueSampledDataOriginSystemSerialised = "http://acme2.org;http://acme2.org",
+                ValueSampledDataOriginUnitSerialised = "mmHg;mmHg",
+                ValueSampledDataOriginValueSerialised = "123;456",
+                ValueSampledDataPeriodSerialised = "1.50;1.50",
+                ValueSampledDataDimensionsSerialised = "5;5",
+                ValueSampledDataDataSerialised = "100 200 300 400 500;600 700 800 900 1000",
 
                 Comments = "A Comment",
 

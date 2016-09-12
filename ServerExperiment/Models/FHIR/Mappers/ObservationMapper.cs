@@ -80,7 +80,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             {
                 observation.PerformerReferences.Add(reference.Reference);
             }
-            /*
+            
             // Observation effective times
             if (source.Effective != null)
             {
@@ -96,7 +96,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     observation.EffectivePeriodEnd = DateTime.Parse(effective.End);
                 }
             }
-            */
+            
             // Observation Interpretation
             observation.InterpretationCode = source.Interpretation.Coding.FirstOrDefault().Code;
             observation.InterpretationDisplay = source.Interpretation.Coding.FirstOrDefault().Display;
@@ -324,7 +324,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     resource.Performer.Add(performerReference);
                 }
             }
-            /*
+            
             // Observation Effective times
             // The choice of Type is DateTime.
             if (observation.EffectiveDateTime != null) 
@@ -344,7 +344,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             resource.Issued = observation.Issued;
-            */
+            
             // Observation Comments
             resource.Comments = observation.Comments;
 
@@ -394,7 +394,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             // Observation Values
             // Values are componentised
-            if (observation.ComponentCodeCode[0] != string.Empty || observation.CodeText != null) 
+            if (observation.ComponentCodeCode[0] != string.Empty || observation.ComponentCodeText != null) 
             {
                 for (int i = 0; i < observation.ComponentCodeCode.Count; i++)
                 {
@@ -402,14 +402,16 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     CodeableConcept concept = new CodeableConcept();
                     Coding coding = new Coding();
                     coding.Code = observation.ComponentCodeCode[i];
+                    coding.Display = observation.ComponentCodeDisplay[i];
+                    coding.System = observation.ComponentCodeSystem[i];
                     concept.Coding.Add(coding);
+                    concept.Text = observation.ComponentCodeText;
                     component.Code = concept;
 
                     resource.Component.Add(component);
-                    //resource.Component[i].Code.Coding.Add(coding);
 
                     // value is of Type Quantity
-                    if (observation.ValueQuantityCode[0] != string.Empty)
+                    if (observation.ValueQuantityValue != null)
                     {
                         Quantity quantity = new Quantity();
                         quantity.Code = observation.ValueQuantityCode[i];
@@ -433,7 +435,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                         resource.Component[i].Value = concept;
                     }
                     // value is of Type String
-                    else if (observation.ValueString != null)
+                    else if (observation.ValueString[0] != string.Empty)
                     {
                         FhirString fhirString = new FhirString();
                         fhirString.Value = observation.ValueString[i];
@@ -441,7 +443,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                         resource.Component[i].Value = fhirString;
                     }
                     // value is of Type SampledData
-                    else if (observation.ValueSampledDataOriginValue[0] != 0)
+                    else if (observation.ValueSampledDataOriginValue != null)
                     {
                         SampledData sampleData = new SampledData();
                         SimpleQuantity quantity = new SimpleQuantity();
@@ -458,14 +460,18 @@ namespace ServerExperiment.Models.FHIR.Mappers
                         resource.Component[i].Value = sampleData;
                     }
                     // value is of Type Period 
-                    // HOW TO CHECK FOR DEFAULT DATETIME VALUE?
-                    else
+                    else if (observation.ValuePeriodStart != null)
                     {
                         Period period = new Period();
                         period.Start = observation.ValuePeriodStart[i].ToString();
                         period.End = observation.ValuePeriodEnd[i].ToString();
 
                         resource.Component[i].Value = period;
+                    } 
+                    // No value provided
+                    else
+                    {
+                        resource.Component[i].Value = null;
                     }
                 }
             }
@@ -473,7 +479,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             else
             {
                 // value is of Type Quantity
-                if (observation.ValueQuantityCode[0] != string.Empty)
+                if (observation.ValueQuantityValue != null)
                 {
                     Quantity quantity = new Quantity();
                     quantity.Code = observation.ValueQuantityCode[0];
@@ -497,7 +503,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     resource.Value = concept;
                 }
                 // value is of Type String
-                else if (observation.ValueString != null)
+                else if (observation.ValueString[0] != string.Empty)
                 {
                     FhirString fhirString = new FhirString();
                     fhirString.Value = observation.ValueString[0];
@@ -505,7 +511,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     resource.Value = fhirString;
                 }
                 // value is of Type SampledData
-                else if (observation.ValueSampledDataOriginValue[0] != 0)
+                else if (observation.ValueSampledDataOriginValue != null)
                 {
                     SampledData sampleData = new SampledData();
                     SimpleQuantity quantity = new SimpleQuantity();
@@ -522,14 +528,18 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     resource.Value = sampleData;
                 }
                 // value is of Type Period 
-                // HOW TO CHECK FOR DEFAULT DATETIME VALUE?
-                else
+                else if (observation.ValuePeriodStart != null)
                 {
                     Period period = new Period();
                     period.Start = observation.ValuePeriodStart[0].ToString();
                     period.End = observation.ValuePeriodEnd[0].ToString();
 
                     resource.Value = period;
+                }
+                // No value provided.
+                else
+                {
+                    resource.Value = null;
                 }
             }
 

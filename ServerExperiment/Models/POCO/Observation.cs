@@ -48,6 +48,11 @@ namespace ServerExperiment.Models
             _valueString = new List<string>();
             _valueSystem = new List<string>();
             _ValueText = new List<string>();
+
+            EffectiveDateTime = DateTime.UtcNow;
+            EffectivePeriodEnd = DateTime.UtcNow;
+            EffectivePeriodStart = DateTime.UtcNow;
+            Issued = DateTime.UtcNow;
         }
 
         // Each Record is immutable, in case of updates we create a new record and 
@@ -151,13 +156,13 @@ namespace ServerExperiment.Models
             get { return String.Join(";", _performerReferences); }
             set { _performerReferences = value.Split(';').ToList(); }
         }
-        /*
+        
         // Observation effective times
         public DateTime EffectiveDateTime { get; set; }
         public DateTime EffectivePeriodStart { get; set; }
         public DateTime EffectivePeriodEnd { get; set; }
         public DateTime Issued { get; set; }
-        */
+        
         // Observation Interpretation
         public string InterpretationSystem { get; set; }
         public string InterpretationCode { get; set; }
