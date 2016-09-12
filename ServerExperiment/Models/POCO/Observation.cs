@@ -43,7 +43,7 @@ namespace ServerExperiment.Models
             _valueSampledDataOriginCode = new List<string>();
             _valueSampledDataOriginSystem = new List<string>();
             _ValueSampledDataOriginUnit = new List<string>();
-            _ValueSampledDataOriginValue = new List<decimal>();
+            _valueSampledDataOriginValue = new List<decimal>();
             _valueSampledDataPeriod = new List<decimal>();
             _valueString = new List<string>();
             _valueSystem = new List<string>();
@@ -74,7 +74,7 @@ namespace ServerExperiment.Models
         }
         public string CategorySystemSerialised
         {
-            get { return String.Join(";", _categorySystem); }
+            get { return string.Join(";", _categorySystem); }
             set { _categorySystem = value.Split(';').ToList(); }
         }
         private List<string> _categoryCode;
@@ -151,13 +151,13 @@ namespace ServerExperiment.Models
             get { return String.Join(";", _performerReferences); }
             set { _performerReferences = value.Split(';').ToList(); }
         }
-
+        /*
         // Observation effective times
         public DateTime EffectiveDateTime { get; set; }
         public DateTime EffectivePeriodStart { get; set; }
         public DateTime EffectivePeriodEnd { get; set; }
         public DateTime Issued { get; set; }
-
+        */
         // Observation Interpretation
         public string InterpretationSystem { get; set; }
         public string InterpretationCode { get; set; }
@@ -256,8 +256,26 @@ namespace ServerExperiment.Models
         }
         public string ValueQuantityValueSerialised
         {
-            get { return String.Join(";", _valueQuantityValue); }
-            set { _valueQuantityValue = value.Split(';').ToList().Select(decimal.Parse).ToList(); }
+            get
+            {
+                if (_valueQuantityValue == null)
+                    return null;
+                else
+                    return String.Join(";", _valueQuantityValue);
+            }
+            set
+            {
+                List<string> quantityValues = value.Split(';').ToList();
+                if (quantityValues[0] == string.Empty)
+                {
+                    _valueQuantityValue = null;
+                }
+                else
+                {
+                    _valueQuantityValue = quantityValues.Select(decimal.Parse).ToList();
+                }
+                //_valueQuantityValue = value.Split(';').ToList().Select(decimal.Parse).ToList();
+            }
         }
 
         private List<string> _valueSystem;
@@ -356,16 +374,35 @@ namespace ServerExperiment.Models
             set { _ValueSampledDataOriginUnit = value.Split(';').ToList(); }
         }
 
-        private List<decimal> _ValueSampledDataOriginValue;
+        private List<decimal> _valueSampledDataOriginValue;
         public List<decimal> ValueSampledDataOriginValue
         {
-            get { return _ValueSampledDataOriginValue; }
-            set { _ValueSampledDataOriginValue = value; }
+            get { return _valueSampledDataOriginValue; }
+            set { _valueSampledDataOriginValue = value; }
         }
         public string ValueSampledDataOriginValueSerialised
         {
-            get { return String.Join(";", _ValueSampledDataOriginValue); }
-            set { _ValueSampledDataOriginValue = value.Split(';').ToList().Select(decimal.Parse).ToList(); }
+            get
+            {
+                if (_valueSampledDataOriginValue == null)
+                    return null;
+                else
+                    return String.Join(";", _valueSampledDataOriginValue);
+            }
+            set
+            {
+                List<string> sampledDataValues = value.Split(';').ToList();
+                if (sampledDataValues[0] == string.Empty)
+                {
+                    _valueSampledDataOriginValue = null;
+                }
+                else
+                {
+                    _valueSampledDataOriginValue = sampledDataValues.Select(decimal.Parse).ToList();
+                }
+
+                //_ValueSampledDataOriginValue = value.Split(';').ToList().Select(decimal.Parse).ToList(); 
+            }
         }
 
         private List<decimal> _valueSampledDataPeriod;
@@ -376,8 +413,27 @@ namespace ServerExperiment.Models
         }
         public string ValueSampledDataPeriodSerialised
         {
-            get { return String.Join(";", _valueSampledDataPeriod); }
-            set { _valueSampledDataPeriod = value.Split(';').ToList().Select(decimal.Parse).ToList(); }
+            get
+            {
+                if (_valueSampledDataPeriod == null)
+                    return null;
+                else
+                    return String.Join(";", _valueSampledDataPeriod);
+            }
+            set
+            {
+                List<string> sampledDataPeriods = value.Split(';').ToList();
+                if (sampledDataPeriods[0] == string.Empty)
+                {
+                    _valueSampledDataPeriod = null;
+                }
+                else
+                {
+                    _valueSampledDataPeriod = sampledDataPeriods.Select(decimal.Parse).ToList();
+                }
+
+                //_valueSampledDataPeriod = value.Split(';').ToList().Select(decimal.Parse).ToList();
+            }
         }
 
         private List<int> _valueSampledDataDimensions;
@@ -388,8 +444,27 @@ namespace ServerExperiment.Models
         }
         public string ValueSampledDataDimensionsSerialised
         {
-            get { return String.Join(";", _valueSampledDataDimensions); }
-            set { _valueSampledDataDimensions = value.Split(';').ToList().Select(int.Parse).ToList(); }
+            get
+            {
+                if (_valueSampledDataDimensions == null)
+                    return null;
+                else
+                    return String.Join(";", _valueSampledDataDimensions);
+            }
+            set
+            {
+                List<string> sampledDataDimensions = value.Split(';').ToList();
+                if (sampledDataDimensions[0] == string.Empty)
+                {
+                    _valueSampledDataDimensions = null;
+                }
+                else
+                {
+                    _valueSampledDataDimensions = sampledDataDimensions.Select(int.Parse).ToList();
+                }
+
+                //_valueSampledDataDimensions = value.Split(';').ToList().Select(int.Parse).ToList();
+            }
         }
 
         private List<string> _ValueSampledDataData;
@@ -412,8 +487,27 @@ namespace ServerExperiment.Models
         }
         public string ValuePeriodStartSerialised
         {
-            get { return String.Join(";", _valuePeriodStart); }
-            set { _valuePeriodStart = value.Split(';').ToList().Select(DateTime.Parse).ToList(); }
+            get
+            {
+                if (_valuePeriodStart == null)
+                    return null;
+                else
+                    return String.Join(";", _valuePeriodStart);
+            }
+            set
+            {
+                List<string> valuePeriodStarts = value.Split(';').ToList();
+                if (valuePeriodStarts[0] == string.Empty)
+                {
+                    _valuePeriodStart = null;
+                }
+                else
+                {
+                    _valuePeriodStart = valuePeriodStarts.Select(DateTime.Parse).ToList();
+                }
+
+                //_valuePeriodStart = value.Split(';').ToList().Select(DateTime.Parse).ToList();
+            }
         }
 
         private List<DateTime> _valuePeriodEnd;
@@ -424,8 +518,27 @@ namespace ServerExperiment.Models
         }
         public string ValuePeriodEndSerialised
         {
-            get { return String.Join(";", _valuePeriodEnd); }
-            set { _valuePeriodEnd = value.Split(';').ToList().Select(DateTime.Parse).ToList(); }
+            get
+            {
+                if (_valuePeriodEnd == null)
+                    return null;
+                else
+                    return String.Join(";", _valuePeriodEnd);
+            }
+            set
+            {
+                List<string> valuePeriodEnds = value.Split(';').ToList();
+                if (valuePeriodEnds[0] == string.Empty)
+                {
+                    _valuePeriodEnd = null;
+                }
+                else
+                {
+                    _valuePeriodEnd = valuePeriodEnds.Select(DateTime.Parse).ToList();
+                }
+
+                //_valuePeriodEnd = value.Split(';').ToList().Select(DateTime.Parse).ToList();
+            }
         }
     }
 }

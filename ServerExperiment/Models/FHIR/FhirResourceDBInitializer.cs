@@ -89,7 +89,7 @@ namespace ServerExperiment.Models
 
             foreach (Device device in defaultDevices)
                 context.Devices.Add(device);
-
+            
             // Seed Observation data
             IList<Observation> defaultObservation = new List<Observation>();
 
@@ -110,8 +110,8 @@ namespace ServerExperiment.Models
                 PatientReference = "Patient/3",
                 PerformerReferencesSerialised = "Patient/3",
 
-                EffectiveDateTime = DateTime.Now,
-                Issued = DateTime.Now,
+                //EffectiveDateTime = DateTime.Now,
+                //Issued = DateTime.Now,
 
                 ValueQuantityValueSerialised = "107",
                 ValueQuantityUnitSerialised = "mm[Hg]",
@@ -131,7 +131,7 @@ namespace ServerExperiment.Models
 
             foreach (Observation observation in defaultObservation)
                 context.Observations.Add(observation);
-
+            
             base.Seed(context);
         }
     }

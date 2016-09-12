@@ -80,7 +80,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             {
                 observation.PerformerReferences.Add(reference.Reference);
             }
-
+            /*
             // Observation effective times
             if (source.Effective != null)
             {
@@ -96,7 +96,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     observation.EffectivePeriodEnd = DateTime.Parse(effective.End);
                 }
             }
-
+            */
             // Observation Interpretation
             observation.InterpretationCode = source.Interpretation.Coding.FirstOrDefault().Code;
             observation.InterpretationDisplay = source.Interpretation.Coding.FirstOrDefault().Display;
@@ -324,7 +324,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     resource.Performer.Add(performerReference);
                 }
             }
-
+            /*
             // Observation Effective times
             // The choice of Type is DateTime.
             if (observation.EffectiveDateTime != null) 
@@ -344,7 +344,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             resource.Issued = observation.Issued;
-
+            */
             // Observation Comments
             resource.Comments = observation.Comments;
 
@@ -398,10 +398,15 @@ namespace ServerExperiment.Models.FHIR.Mappers
             {
                 for (int i = 0; i < observation.ComponentCodeCode.Count; i++)
                 {
+                    ComponentComponent component = new ComponentComponent();
+                    CodeableConcept concept = new CodeableConcept();
                     Coding coding = new Coding();
                     coding.Code = observation.ComponentCodeCode[i];
+                    concept.Coding.Add(coding);
+                    component.Code = concept;
 
-                    resource.Component[i].Code.Coding.Add(coding);
+                    resource.Component.Add(component);
+                    //resource.Component[i].Code.Coding.Add(coding);
 
                     // value is of Type Quantity
                     if (observation.ValueQuantityCode[0] != string.Empty)
@@ -417,7 +422,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     // value is of Type CodeableConcept
                     else if (observation.ValueCode[0] != string.Empty)
                     {
-                        CodeableConcept concept = new CodeableConcept();
+                        concept = new CodeableConcept();
                         coding = new Coding();
                         coding.Code = observation.ValueCode[i];
                         coding.Display = observation.ValueDisplay[i];
@@ -476,7 +481,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     quantity.Unit = observation.ValueQuantityUnit[0];
                     quantity.Value = observation.ValueQuantityValue[0];
 
-                    resource.Component[0].Value = quantity;
+                    resource.Value = quantity;
                 }
                 // value is of Type CodeableConcept
                 else if (observation.ValueCode[0] != string.Empty)
@@ -489,7 +494,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
                     concept.Coding.Add(coding);
                     concept.Text = observation.ValueText[0];
-                    resource.Component[0].Value = concept;
+                    resource.Value = concept;
                 }
                 // value is of Type String
                 else if (observation.ValueString != null)
@@ -497,7 +502,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     FhirString fhirString = new FhirString();
                     fhirString.Value = observation.ValueString[0];
 
-                    resource.Component[0].Value = fhirString;
+                    resource.Value = fhirString;
                 }
                 // value is of Type SampledData
                 else if (observation.ValueSampledDataOriginValue[0] != 0)
@@ -514,7 +519,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     sampleData.Dimensions = observation.ValueSampledDataDimensions[0];
                     sampleData.Period = observation.ValueSampledDataPeriod[0];
 
-                    resource.Component[0].Value = sampleData;
+                    resource.Value = sampleData;
                 }
                 // value is of Type Period 
                 // HOW TO CHECK FOR DEFAULT DATETIME VALUE?
@@ -524,7 +529,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     period.Start = observation.ValuePeriodStart[0].ToString();
                     period.End = observation.ValuePeriodEnd[0].ToString();
 
-                    resource.Component[0].Value = period;
+                    resource.Value = period;
                 }
             }
 
