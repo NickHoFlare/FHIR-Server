@@ -8,6 +8,11 @@ namespace ServerExperiment.Controllers.FhirControllers
 {
     public static class ControllerUtils
     {
+        public const string CREATE = "CREATE";
+        public const string UPDATE = "UPDATE";
+        public const string DELETE = "DELETE";
+        public const string UNASSIGNED = "UNASSIGNED";
+
         public static string FixMimeString(string mimeFormat)
         {
             if (mimeFormat.IndexOf("JSON", StringComparison.InvariantCultureIgnoreCase) >= 0)

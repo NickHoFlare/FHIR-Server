@@ -6,6 +6,7 @@ using System.Web;
 using Hl7.Fhir.Model;
 using static Hl7.Fhir.Model.Observation;
 using ServerExperiment.Models.FHIR.Helpers.Observation;
+using ServerExperiment.Controllers.FhirControllers;
 
 namespace ServerExperiment.Models
 {
@@ -13,12 +14,13 @@ namespace ServerExperiment.Models
     {
         public Observation()
         {
-            RecordNo = 0;
-            Timestamp = DateTime.UtcNow;
+            RecordNo = 1;
+            VersionId = 1;
+            LastModified = DateTime.UtcNow;
+            Action = ControllerUtils.UNASSIGNED;
             IsDeleted = false;
 
             ObservationId = 0;
-            Version = 0;
 
             _categoryCode = new List<string>();
             _categoryDisplay = new List<string>();
@@ -58,8 +60,8 @@ namespace ServerExperiment.Models
         // Each Record is immutable, in case of updates we create a new record and 
         // keep track of Version, Time of modification and action type like CREATE/UPDATE
         public int RecordNo { get; set; }
-        public int Version { get; set; }
-        public DateTime Timestamp { get; set; }
+        public int VersionId { get; set; }
+        public DateTime LastModified { get; set; }
         public string Action { get; set; }
         public bool IsDeleted { get; set; }
 

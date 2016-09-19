@@ -1,4 +1,5 @@
-﻿using ServerExperiment.Models.FHIR.Helpers.Device;
+﻿using ServerExperiment.Controllers.FhirControllers;
+using ServerExperiment.Models.FHIR.Helpers.Device;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,19 +12,20 @@ namespace ServerExperiment.Models
 	{
         public Device()
         {
-            RecordNo = 0;
-            Timestamp = DateTime.UtcNow;
+            RecordNo = 1;
+            VersionId = 1;
+            LastModified = DateTime.UtcNow;
+            Action = ControllerUtils.UNASSIGNED;
             IsDeleted = false;
 
             DeviceId = 0;
-            Version = 0;
         }
 
         // Each Record is immutable, in case of updates we create a new record and 
         // keep track of Version, Time of modification and action type like CREATE/UPDATE
         public int RecordNo { get; set; }
-        public int Version { get; set; }
-        public DateTime Timestamp { get; set; }
+        public int VersionId { get; set; }
+        public DateTime LastModified { get; set; }
         public string Action { get; set; }
         public bool IsDeleted { get; set; }
 

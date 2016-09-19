@@ -30,8 +30,9 @@ namespace ServerExperiment.Models
             defaultPatients.Add(new Patient() {
                 RecordNo = 1,
                 Nationality = "Blablabla",
-                Timestamp = DateTime.UtcNow,
-                IsDeleted = false, Version = 1,
+                LastModified = DateTime.UtcNow,
+                IsDeleted = false,
+                VersionId = 1,
                 FirstNamesSerialised = firstNames,
                 LastNamesSerialised = lastNames,
                 Birthday = DateTime.Parse("22/03/1991"),
@@ -49,9 +50,9 @@ namespace ServerExperiment.Models
             });
             defaultPatients.Add(new Patient() { RecordNo = 2,
                 Nationality = "Australian",
-                Timestamp = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
                 IsDeleted = false,
-                Version = 1,
+                VersionId = 1,
                 FirstNamesSerialised = firstNames,
                 LastNamesSerialised = lastNames,
                 Birthday = DateTime.Parse("22/03/1991"),
