@@ -49,19 +49,21 @@ namespace ServerExperiment.Controllers.FhirControllers
             return message;
         }
 
-        // PUT: api/Device/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutDevice(int id, Device device)
+        // PUT: fhir/Device/5
+        [Route("fhir/Device/{deviceId}")]
+        [HttpPut]
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Device fhirDevice, int deviceId)
         {
-            if (!ModelState.IsValid)
+            HttpResponseMessage message = new HttpResponseMessage();
+
+            if (deviceId != int.Parse(fhirDevice.Id))
             {
-                return BadRequest(ModelState);
+                message.StatusCode = HttpStatusCode.BadRequest;
+                message.Content = new StringContent("Mismatch of Device ID! Provided " + deviceId + " in URL but found " + fhirDevice.Id + "in payload!", Encoding.UTF8, "text/html");
+                return message;
             }
 
-            if (id != device.DeviceId)
-            {
-                return BadRequest();
-            }
+            Device device = DeviceMapper.MapResource(fhirDevice);
 
             db.Entry(device).State = EntityState.Modified;
 
@@ -71,9 +73,11 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!DeviceExists(id))
+                if (!DeviceExists(deviceId))
                 {
-                    return NotFound();
+                    message.StatusCode = HttpStatusCode.NotFound;
+                    message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
+                    return message;
                 }
                 else
                 {
@@ -81,38 +85,49 @@ namespace ServerExperiment.Controllers.FhirControllers
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            message.StatusCode = HttpStatusCode.NoContent;
+            return message;
         }
 
-        // POST: api/Device
-        [ResponseType(typeof(Device))]
-        public IHttpActionResult PostDevice(Device device)
+        // POST: fhir/Device
+        [Route("fhir/Device")]
+        [HttpPost]
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Device fhirDevice)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            HttpResponseMessage message = new HttpResponseMessage();
+
+            Models.Device device = DeviceMapper.MapResource(fhirDevice);
 
             db.Devices.Add(device);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = device.DeviceId }, device);
+            message.Content = new StringContent("Device created!", Encoding.UTF8, "text/html");
+            message.StatusCode = HttpStatusCode.Created;
+            message.Headers.Location = new Uri(Url.Link("SpecificDevice", new { id = device.DeviceId }));
+
+            return message;
         }
 
-        // DELETE: api/Device/5
-        [ResponseType(typeof(Device))]
-        public IHttpActionResult DeleteDevice(int id)
+        // DELETE: fhir/Device/5
+        [Route("fhir/Device/{deviceId}")]
+        [HttpDelete]
+        public HttpResponseMessage Delete(int deviceId)
         {
-            Device device = db.Devices.Find(id);
+            HttpResponseMessage message = new HttpResponseMessage();
+
+            Device device = db.Devices.Find(deviceId);
             if (device == null)
             {
-                return NotFound();
+                message.StatusCode = HttpStatusCode.NotFound;
+                message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
+                return message;
             }
 
             db.Devices.Remove(device);
             db.SaveChanges();
 
-            return Ok(device);
+            message.StatusCode = HttpStatusCode.NoContent;
+            return message;
         }
 
         protected override void Dispose(bool disposing)

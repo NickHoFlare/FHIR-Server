@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -49,19 +47,21 @@ namespace ServerExperiment.Controllers.FhirControllers
             return message;
         }
 
-        // PUT: api/Observation/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutObservation(int id, Observation observation)
+        // PUT: fhir/Observation/5
+        [Route("fhir/Observation/{observationId}")]
+        [HttpPut]
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Observation fhirObservation, int observationId)
         {
-            if (!ModelState.IsValid)
+            HttpResponseMessage message = new HttpResponseMessage();
+
+            if (observationId != int.Parse(fhirObservation.Id))
             {
-                return BadRequest(ModelState);
+                message.StatusCode = HttpStatusCode.BadRequest;
+                message.Content = new StringContent("Mismatch of observation ID! Provided " + observationId + " in URL but found " + fhirObservation.Id + "in payload!", Encoding.UTF8, "text/html");
+                return message;
             }
 
-            if (id != observation.ObservationId)
-            {
-                return BadRequest();
-            }
+            Observation observation = ObservationMapper.MapResource(fhirObservation);
 
             db.Entry(observation).State = EntityState.Modified;
 
@@ -71,9 +71,11 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ObservationExists(id))
+                if (!ObservationExists(observationId))
                 {
-                    return NotFound();
+                    message.StatusCode = HttpStatusCode.NotFound;
+                    message.Content = new StringContent("observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
+                    return message;
                 }
                 else
                 {
@@ -81,38 +83,49 @@ namespace ServerExperiment.Controllers.FhirControllers
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            message.StatusCode = HttpStatusCode.NoContent;
+            return message;
         }
 
-        // POST: api/Observation
-        [ResponseType(typeof(Observation))]
-        public IHttpActionResult PostObservation(Observation observation)
+        // POST: fhir/Observation
+        [Route("fhir/Observation")]
+        [HttpPost]
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Observation fhirObservation)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            HttpResponseMessage message = new HttpResponseMessage();
+
+            Models.Observation observation = ObservationMapper.MapResource(fhirObservation);
 
             db.Observations.Add(observation);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = observation.ObservationId }, observation);
+            message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
+            message.StatusCode = HttpStatusCode.Created;
+            message.Headers.Location = new Uri(Url.Link("SpecificObservation", new { id = observation.ObservationId }));
+
+            return message;
         }
 
-        // DELETE: api/Observation/5
-        [ResponseType(typeof(Observation))]
-        public IHttpActionResult DeleteObservation(int id)
+        // DELETE: fhir/Observation/5
+        [Route("fhir/Observation/{observationId}")]
+        [HttpDelete]
+        public HttpResponseMessage Delete(int observationId)
         {
-            Observation observation = db.Observations.Find(id);
+            HttpResponseMessage message = new HttpResponseMessage();
+
+            Observation observation = db.Observations.Find(observationId);
             if (observation == null)
             {
-                return NotFound();
+                message.StatusCode = HttpStatusCode.NotFound;
+                message.Content = new StringContent("Observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
+                return message;
             }
 
             db.Observations.Remove(observation);
             db.SaveChanges();
 
-            return Ok(observation);
+            message.StatusCode = HttpStatusCode.NoContent;
+            return message;
         }
 
         protected override void Dispose(bool disposing)

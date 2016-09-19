@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using ServerExperiment.Models;
-using Hl7.Fhir.Serialization;
 using ServerExperiment.Models.FHIR.Mappers;
 using System.Text;
 using ServerExperiment.Controllers.FhirControllers;
@@ -50,18 +49,20 @@ namespace ServerExperiment.Controllers
         }
 
         // PUT: fhir/Patient/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutPatient(int id, Patient patient)
+        [Route("fhir/Patient/{patientId}")]
+        [HttpPut]
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Patient fhirPatient, int patientId)
         {
-            if (!ModelState.IsValid)
+            HttpResponseMessage message = new HttpResponseMessage();
+
+            if (patientId != int.Parse(fhirPatient.Id))
             {
-                return BadRequest(ModelState);
+                message.StatusCode = HttpStatusCode.BadRequest;
+                message.Content = new StringContent("Mismatch of patient ID! Provided " + patientId + " in URL but found " + fhirPatient.Id + "in payload!", Encoding.UTF8, "text/html");
+                return message;
             }
 
-            if (id != patient.PatientId)
-            {
-                return BadRequest();
-            }
+            Patient patient = PatientMapper.MapResource(fhirPatient);
 
             db.Entry(patient).State = EntityState.Modified;
 
@@ -71,9 +72,11 @@ namespace ServerExperiment.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PatientExists(id))
+                if (!PatientExists(patientId))
                 {
-                    return NotFound();
+                    message.StatusCode = HttpStatusCode.NotFound;
+                    message.Content = new StringContent("Patient with id " + patientId + " not found!", Encoding.UTF8, "text/html");
+                    return message;
                 }
                 else
                 {
@@ -81,7 +84,8 @@ namespace ServerExperiment.Controllers
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            message.StatusCode = HttpStatusCode.NoContent;
+            return message;
         }
 
         // POST: fhir/Patient
