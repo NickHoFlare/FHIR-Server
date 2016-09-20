@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using System.Data.Entity;
+using ServerExperiment.Models.POCO;
 
 namespace ServerExperiment.Models
 {
@@ -20,8 +17,8 @@ namespace ServerExperiment.Models
             Database.SetInitializer<FhirResourceContext>(new DropCreateDatabaseAlways<FhirResourceContext>());
         }
 
-        public System.Data.Entity.DbSet<ServerExperiment.Models.Patient> Patients { get; set; }
-        public System.Data.Entity.DbSet<ServerExperiment.Models.Device> Devices { get; set; }
-        public System.Data.Entity.DbSet<ServerExperiment.Models.Observation> Observations { get; set; }
+        public System.Data.Entity.DbSet<Patient> Patients { get; set; }
+        public System.Data.Entity.DbSet<Device> Devices { get; set; }
+        public System.Data.Entity.DbSet<Observation> Observations { get; set; }
     }
 }

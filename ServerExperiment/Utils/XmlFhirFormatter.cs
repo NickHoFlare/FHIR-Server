@@ -20,28 +20,50 @@ namespace ServerExperiment.Utils
 
         public override bool CanReadType(Type type)
         {
+            bool canRead = false;
+
             // for single product object
-            if (type == typeof(Hl7.Fhir.Model.Patient))
-                return true;
+            if (type == typeof(Hl7.Fhir.Model.Patient) ||
+                type == typeof(Hl7.Fhir.Model.Device)  ||
+                type == typeof(Hl7.Fhir.Model.Observation))
+            {
+                canRead = true;
+
+                return canRead;
+            }
+            return canRead;
+            /*
             else // Else block likely not going to be used.
             {
                 // for multiple product objects
                 Type _type = typeof(IEnumerable<Hl7.Fhir.Model.Patient>);
                 return _type.IsAssignableFrom(type);
             }
+            */
         }
 
         public override bool CanWriteType(Type type)
         {
+            bool canWrite = false;
+
             //for single product object
-            if (type == typeof(Hl7.Fhir.Model.Patient))
-                return true;
+            if (type == typeof(Hl7.Fhir.Model.Patient) ||
+                type == typeof(Hl7.Fhir.Model.Device) ||
+                type == typeof(Hl7.Fhir.Model.Observation))
+            {
+                canWrite = true;
+
+                return canWrite;
+            }
+            return canWrite;
+            /*
             else // Else block likely not going to be used.
             {
                 // for multiple product objects
                 Type _type = typeof(IEnumerable<Hl7.Fhir.Model.Patient>);
                 return _type.IsAssignableFrom(type);
             }
+            */
         }
 
         public override void WriteToStream(Type type,

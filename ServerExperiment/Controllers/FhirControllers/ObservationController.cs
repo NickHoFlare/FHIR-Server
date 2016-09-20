@@ -5,10 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Description;
-using ServerExperiment.Models;
 using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
+using ServerExperiment.Models.POCO;
+using ServerExperiment.Models;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
@@ -62,6 +62,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
+            ControllerUtils.AddMetadata(observation, ControllerUtils.UPDATE);
 
             db.Entry(observation).State = EntityState.Modified;
 
@@ -94,7 +95,8 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Models.Observation observation = ObservationMapper.MapResource(fhirObservation);
+            Observation observation = ObservationMapper.MapResource(fhirObservation);
+            ControllerUtils.AddMetadata(observation, ControllerUtils.CREATE);
 
             db.Observations.Add(observation);
             db.SaveChanges();
@@ -120,6 +122,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
+            ControllerUtils.AddMetadata(observation, ControllerUtils.DELETE);
 
             db.Observations.Remove(observation);
             db.SaveChanges();

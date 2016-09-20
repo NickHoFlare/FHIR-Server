@@ -1,11 +1,11 @@
-﻿using ServerExperiment.Models.FHIR.Helpers.Device;
+﻿using ServerExperiment.Models.FHIR;
+using ServerExperiment.Models.FHIR.Helpers.Device;
 using ServerExperiment.Models.FHIR.Helpers.Observation;
 using ServerExperiment.Models.FHIR.Helpers.Patient;
+using ServerExperiment.Models.POCO;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace ServerExperiment.Models
 {
@@ -28,7 +28,7 @@ namespace ServerExperiment.Models
 
             defaultPatients.Add(new Patient());
             defaultPatients.Add(new Patient() {
-                RecordNo = 1,
+                RecordId = 1,
                 Nationality = "Blablabla",
                 LastModified = DateTime.UtcNow,
                 IsDeleted = false,
@@ -48,7 +48,7 @@ namespace ServerExperiment.Models
                 Active = true,
                 Deceased = false
             });
-            defaultPatients.Add(new Patient() { RecordNo = 2,
+            defaultPatients.Add(new Patient() { RecordId = 2,
                 Nationality = "Australian",
                 LastModified = DateTime.UtcNow,
                 IsDeleted = false,

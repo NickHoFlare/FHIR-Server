@@ -15,15 +15,15 @@ namespace ServerExperiment.Models.FHIR.Mappers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public static Models.Observation MapResource(Resource resource)
+        public static POCO.Observation MapResource(Resource resource)
         {
-            var source = resource as Hl7.Fhir.Model.Observation;
+            var source = resource as Observation;
             if (source == null)
             {
                 throw new ArgumentException("Resource in not a HL7 FHIR observation resouce");
             }
 
-            Models.Observation observation = new Observation();
+            POCO.Observation observation = new POCO.Observation();
 
             // observation Status
             var status = source.Status.GetValueOrDefault();
@@ -56,29 +56,44 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation Category
-            foreach (Coding coding in source.Category.Coding)
+            if (source.Category != null)
             {
-                observation.CategoryCode.Add(coding.Code);
-                observation.CategoryDisplay.Add(coding.Display);
-                observation.CategorySystem.Add(coding.System);
+                foreach (Coding coding in source.Category.Coding)
+                {
+                    if (coding.Code != null)
+                        observation.CategoryCode.Add(coding.Code);
+                    if (coding.Display != null)
+                        observation.CategoryDisplay.Add(coding.Display);
+                    if (coding.System != null)
+                        observation.CategorySystem.Add(coding.System);
+                }
+                observation.CategoryText = source.Category.Text;
             }
-            observation.CategoryText = source.Category.Text;
 
             // Observation Code
-            foreach (Coding coding in source.Code.Coding)
+            if (source.Category != null)
             {
-                observation.CodeCode.Add(coding.Code);
-                observation.CodeDisplay.Add(coding.Display);
-                observation.CodeSystem.Add(coding.System);
+                foreach (Coding coding in source.Code.Coding)
+                {
+                    if (coding.Code != null)
+                        observation.CodeCode.Add(coding.Code);
+                    if (coding.Display != null)
+                        observation.CodeDisplay.Add(coding.Display);
+                    if (coding.System != null)
+                        observation.CodeSystem.Add(coding.System);
+                }
+                observation.CodeText = source.Code.Text;
             }
-            observation.CodeText = source.Code.Text;
 
             // Observation references to other resources
-            observation.PatientReference = source.Subject.Reference;
-            observation.DeviceReference = source.Device.Reference;
+            if (source.Subject != null)
+                observation.PatientReference = source.Subject.Reference;
+            if (source.Device != null)
+                observation.DeviceReference = source.Device.Reference;
             foreach (var reference in source.Performer)
             {
-                observation.PerformerReferences.Add(reference.Reference);
+                if (reference.Reference != null)
+                    observation.PerformerReferences.Add(reference.Reference);
             }
             
             // Observation effective times
@@ -96,40 +111,59 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     observation.EffectivePeriodEnd = DateTime.Parse(effective.End);
                 }
             }
-            
+
             // Observation Interpretation
-            observation.InterpretationCode = source.Interpretation.Coding.FirstOrDefault().Code;
-            observation.InterpretationDisplay = source.Interpretation.Coding.FirstOrDefault().Display;
-            observation.InterpretationSystem = source.Interpretation.Coding.FirstOrDefault().System;
-            observation.InterpretationText = source.Interpretation.Text;
+            if (source.Interpretation != null)
+            {
+                if (source.Interpretation.Coding != null)
+                {
+                    observation.InterpretationCode = source.Interpretation.Coding.FirstOrDefault().Code;
+                    observation.InterpretationDisplay = source.Interpretation.Coding.FirstOrDefault().Display;
+                    observation.InterpretationSystem = source.Interpretation.Coding.FirstOrDefault().System;
+                }
+                observation.InterpretationText = source.Interpretation.Text;
+            }
 
             // Observation Comments
-            observation.Comments = source.Comments;
+            if (source.Comments != null)
+                observation.Comments = source.Comments;
 
             // Site of Body where Observation was made
-            observation.BodySiteCode = source.BodySite.Coding.FirstOrDefault().Code;
-            observation.BodySiteDisplay = source.BodySite.Coding.FirstOrDefault().Display;
-            observation.BodySiteSystem = source.BodySite.Coding.FirstOrDefault().System;
-            observation.BodySiteText = source.BodySite.Text;
+            if (source.BodySite != null)
+            {
+                if (source.BodySite.Coding != null)
+                {
+                    observation.BodySiteCode = source.BodySite.Coding.FirstOrDefault().Code;
+                    observation.BodySiteDisplay = source.BodySite.Coding.FirstOrDefault().Display;
+                    observation.BodySiteSystem = source.BodySite.Coding.FirstOrDefault().System;
+                }
+                observation.BodySiteText = source.BodySite.Text;
+            }
 
             // Observation values / components
             // If only one value, then simply a value type. If more than one, then Component type.
-            if (source.Component == null) // Must be a value
+            if (source.Component == null || source.Component.Count == 0) // Must be a value
             {
                 if (source.Value is Quantity)
                 {
                     var value = source.Value as Quantity;
-                    observation.ValueQuantityCode.Add(value.Code);
-                    observation.ValueQuantitySystem.Add(value.System);
-                    observation.ValueQuantityUnit.Add(value.Unit);
+                    if (value.Code != null)
+                        observation.ValueQuantityCode.Add(value.Code);
+                    if (value.System != null)
+                        observation.ValueQuantitySystem.Add(value.System);
+                    if (value.Unit != null)
+                        observation.ValueQuantityUnit.Add(value.Unit);
                     observation.ValueQuantityValue.Add((decimal)value.Value);
                 }
                 else if (source.Value is CodeableConcept)
                 {
                     var value = source.Value as CodeableConcept;
-                    observation.ValueSystem.Add(value.Coding.FirstOrDefault().System);
-                    observation.ValueCode.Add(value.Coding.FirstOrDefault().Code);
-                    observation.ValueDisplay.Add(value.Coding.FirstOrDefault().Display);
+                    if (value.Coding != null)
+                    {
+                        observation.ValueSystem.Add(value.Coding.FirstOrDefault().System);
+                        observation.ValueCode.Add(value.Coding.FirstOrDefault().Code);
+                        observation.ValueDisplay.Add(value.Coding.FirstOrDefault().Display);
+                    }
                     observation.ValueText.Add(value.Text);
                 }
                 else if (source.Value is FhirString)
@@ -213,14 +247,14 @@ namespace ServerExperiment.Models.FHIR.Mappers
         /// </summary>
         /// <param name="observation"></param>
         /// <returns></returns>
-        public static Hl7.Fhir.Model.Observation MapModel(Models.Observation observation)
+        public static Observation MapModel(POCO.Observation observation)
         {
             if (observation == null)
             {
                 throw new ArgumentNullException("observation");
             }
 
-            var resource = new Hl7.Fhir.Model.Observation();
+            var resource = new Observation();
 
             resource.Id = observation.ObservationId.ToString("D");
 

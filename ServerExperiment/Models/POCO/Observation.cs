@@ -2,20 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
-using Hl7.Fhir.Model;
-using static Hl7.Fhir.Model.Observation;
 using ServerExperiment.Models.FHIR.Helpers.Observation;
 using ServerExperiment.Controllers.FhirControllers;
 
-namespace ServerExperiment.Models
+namespace ServerExperiment.Models.POCO
 {
-    public class Observation
+    public class Observation : IModel
     {
         public Observation()
         {
-            RecordNo = 1;
-            VersionId = 1;
+            RecordId = 0;
+            VersionId = 0;
             LastModified = DateTime.UtcNow;
             Action = ControllerUtils.UNASSIGNED;
             IsDeleted = false;
@@ -59,7 +56,7 @@ namespace ServerExperiment.Models
 
         // Each Record is immutable, in case of updates we create a new record and 
         // keep track of Version, Time of modification and action type like CREATE/UPDATE
-        public int RecordNo { get; set; }
+        public int RecordId { get; set; }
         public int VersionId { get; set; }
         public DateTime LastModified { get; set; }
         public string Action { get; set; }

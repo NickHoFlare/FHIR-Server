@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Hl7.Fhir.Model;
 using ServerExperiment.Models.FHIR.Helpers.Patient;
 
-namespace ServerExperiment.Models.FHIR.Mappers
+namespace ServerExperiment.POCO.FHIR.Mappers
 {
     public class PatientMapper
     {
@@ -14,15 +13,15 @@ namespace ServerExperiment.Models.FHIR.Mappers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public static Models.Patient MapResource(Resource resource)
+        public static Models.POCO.Patient MapResource(Resource resource)
         {
-            var source = resource as Hl7.Fhir.Model.Patient;
+            var source = resource as Patient;
             if (source == null)
             {
                 throw new ArgumentException("Resource in not a HL7 FHIR Patient resouce");
             }
 
-            Models.Patient patient = new Models.Patient();
+            Models.POCO.Patient patient = new Models.POCO.Patient();
 
             patient.Active = source.Active ?? true; // Set to value of source.Active. if null, set to true.
             var deceased = source.Deceased as FhirBoolean;
@@ -33,10 +32,15 @@ namespace ServerExperiment.Models.FHIR.Mappers
             List<string> firstNames = new List<string>();
             List<string> lastNames = new List<string>();
             
-            for (int i = 0; i < source.Name.Count; i++)
+            foreach (var name in source.Name)
             {
-                firstNames[i] = source.Name[i].Given.FirstOrDefault();
-                lastNames[i] = source.Name[i].Family.FirstOrDefault();
+                var firstName = name.Given.FirstOrDefault();
+                var lastName = name.Family.FirstOrDefault();
+
+                if (firstName != null)
+                    firstNames.Add(firstName);
+                if (lastName != null)
+                    lastNames.Add(lastName);
             }
 
             patient.FirstNames = firstNames;
@@ -87,7 +91,8 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             // Patient birthday
             var birthday = source.BirthDate;
-            patient.Birthday = DateTime.Parse(birthday);
+            if (birthday != null)
+                patient.Birthday = DateTime.Parse(birthday);
 
             // Patient Address
             List<string> addressLines1 = new List<string>();
@@ -99,18 +104,43 @@ namespace ServerExperiment.Models.FHIR.Mappers
             List<string> periodStarts = new List<string>();
             List<string> periodEnds = new List<string>();
 
-            for (int i = 0; i < source.Address.Count; i++)
+            foreach (var address in source.Address)
             {
-                addressLines1[i] = source.Address[i].LineElement[0].Value;
-                addressLines2[i] = source.Address[i].LineElement[1].Value;
-                postalCodes[i] = source.Address[i].PostalCode;
-                cities[i] = source.Address[i].City;
-                countries[i] = source.Address[i].Country;
-                states[i] = source.Address[i].State;
-                periodStarts[i] = source.Address[i].Period.Start;
-                periodEnds[i] = source.Address[i].Period.End;
-            }
+                string addLine1 = address.LineElement[0].Value;
+                string addLine2 = null;
+                if (address.LineElement.Count > 1)
+                    addLine2 = address.LineElement[1].Value;
+                string postalCode = address.PostalCode;
+                string city = address.City;
+                string country = address.Country;
+                string state = address.State;
+                var period = address.Period;
+                string periodStart = null;
+                string periodEnd = null;
+                if (period != null)
+                {
+                    periodStart = address.Period.Start;
+                    periodEnd = address.Period.End;
+                }
 
+                if (addLine1 != null)
+                    addressLines1.Add(addLine1);
+                if (addLine2 != null)
+                    addressLines2.Add(addLine2);
+                if (postalCode != null)
+                    postalCodes.Add(postalCode);
+                if (city != null)
+                    cities.Add(city);
+                if (country != null)
+                    countries.Add(country);
+                if (state != null)
+                    states.Add(state);
+                if (periodStart != null)
+                    periodStarts.Add(periodStart);
+                if (periodEnd != null)
+                    periodEnds.Add(periodEnd);
+            }
+            
             patient.AddressLines1 = addressLines1;
             patient.AddressLines2 = addressLines2;
             patient.PostalCodes = postalCodes;
@@ -128,14 +158,14 @@ namespace ServerExperiment.Models.FHIR.Mappers
         /// </summary>
         /// <param name="patient"></param>
         /// <returns></returns>
-        public static Hl7.Fhir.Model.Patient MapModel(Models.Patient patient)
+        public static Patient MapModel(Models.POCO.Patient patient)
         {
             if (patient == null)
             {
                 throw new ArgumentNullException("patient");
             }
 
-            var resource = new Hl7.Fhir.Model.Patient();
+            var resource = new Patient();
 
             resource.Id = patient.PatientId.ToString("D"); // wtf does this line do
 
@@ -147,18 +177,24 @@ namespace ServerExperiment.Models.FHIR.Mappers
             resource.Name = new List<HumanName>();
             List<HumanName> fhirNames = new List<HumanName>();
 
-            for (int j = 0; j < patient.FirstNames.Count; j++)
+            List<string> firstNames = new List<string>();
+            List<string> lastNames = new List<string>();
+            foreach (var first in patient.FirstNames)
             {
-                HumanName fhirName = new HumanName()
-                {
-                    Family = new[] { patient.FirstNames[j] },
-                    Given = new[] { patient.LastNames[j] },
-                    Use = HumanName.NameUse.Official
-                };
-
-                fhirNames.Add(fhirName);
+                firstNames.Add(first);
             }
+            foreach (var last in patient.LastNames)
+            {
+                lastNames.Add(last);
+            }
+            HumanName fhirName = new HumanName()
+            {
+                Family = lastNames,
+                Given = firstNames,
+                Use = HumanName.NameUse.Official
+            };
 
+            fhirNames.Add(fhirName);
             resource.Name = fhirNames;
 
             // Patient Birthday
@@ -189,24 +225,44 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Patient Telecom
-            resource.Telecom = new List<ContactPoint>
+            ContactPoint phone = null;
+            ContactPoint mobile = null;
+            ContactPoint email = null;
+
+            if (patient.Phone != null)
             {
-                new ContactPoint() {
+                phone = new ContactPoint()
+                {
                     Value = patient.Phone,
                     System = ContactPoint.ContactPointSystem.Phone,
                     Use = ContactPoint.ContactPointUse.Home
-                },
-                new ContactPoint() {
+                };
+            }
+            if (patient.Mobile != null)
+            {
+                mobile = new ContactPoint()
+                {
                     Value = patient.Mobile,
                     System = ContactPoint.ContactPointSystem.Phone,
                     Use = ContactPoint.ContactPointUse.Mobile
-                },
-                new ContactPoint() {
+                };
+            }
+            if (patient.Email != null)
+            {
+                email = new ContactPoint()
+                {
                     Value = patient.Email,
                     System = ContactPoint.ContactPointSystem.Email,
                     Use = ContactPoint.ContactPointUse.Home
-                },
-            };
+                };
+            }
+
+            if (patient.Phone != null || patient.Mobile != null || patient.Email != null)
+            {
+                resource.Telecom = new List<ContactPoint>{
+                    phone,mobile,email
+                };
+            }
 
             // Patient Address
             resource.Address = new List<Address>();
@@ -239,11 +295,11 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             // Make use of extensions ...
             //
+            
             resource.Extension = new List<Extension>(1);
             resource.Extension.Add(new Extension("http://www.englishclub.com/vocabulary/world-countries-nationality.htm",
                                                     new FhirString(patient.Nationality)
                                                     ));
-
             return resource;
         }
     }

@@ -4,16 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
 
-namespace ServerExperiment.Models
+namespace ServerExperiment.Models.POCO
 {
-	public class Patient
+    public class Patient : IModel
 	{
         public Patient()
         {
-            RecordNo = 1;
-            VersionId = 1;
+            RecordId = 0;
+            VersionId = 0;
             LastModified = DateTime.UtcNow;
             Action = ControllerUtils.UNASSIGNED;
             IsDeleted = false;
@@ -37,10 +36,9 @@ namespace ServerExperiment.Models
             _periodEnds = new List<string>();
         }
 
-
         // Each Record is immutable, in case of updates we create a new record and 
         // keep track of Version, Time of modification and action type like CREATE/UPDATE
-        public int RecordNo { get; set; }
+        public int RecordId { get; set; }
         public int VersionId { get; set; }
         public DateTime LastModified { get; set; }
         public string Action { get; set; }

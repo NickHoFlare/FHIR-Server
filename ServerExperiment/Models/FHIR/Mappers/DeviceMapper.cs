@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Hl7.Fhir.Model;
 using static Hl7.Fhir.Model.Device;
 using ServerExperiment.Models.FHIR.Helpers.Device;
@@ -15,21 +14,28 @@ namespace ServerExperiment.Models.FHIR.Mappers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public static Models.Device MapResource(Resource resource)
+        public static POCO.Device MapResource(Resource resource)
         {
-            var source = resource as Hl7.Fhir.Model.Device;
+            var source = resource as Device;
             if (source == null)
             {
                 throw new ArgumentException("Resource in not a HL7 FHIR Device resouce");
             }
 
-            Models.Device device = new Models.Device();
+            POCO.Device device = new POCO.Device();
 
             // Device Type
-            device.TypeCode = source.Type.Coding.FirstOrDefault().Code;
-            device.TypeDisplay = source.Type.Coding.FirstOrDefault().Display;
-            device.TypeSystem = source.Type.Coding.FirstOrDefault().System;
-            device.TypeText = source.Type.Text;
+            if (source.Type != null)
+            {
+                if (source.Type.Coding != null)
+                {
+                    device.TypeCode = source.Type.Coding.FirstOrDefault().Code;
+                    device.TypeDisplay = source.Type.Coding.FirstOrDefault().Display;
+                    device.TypeSystem = source.Type.Coding.FirstOrDefault().System;
+                }
+                if (source.Type.Text != null)
+                    device.TypeText = source.Type.Text;
+            }
 
             // Device Status
             var status = source.Status.GetValueOrDefault();
@@ -50,12 +56,18 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Device Other details
-            device.Manufacturer = source.Manufacturer;
-            device.Model = source.Model;
-            device.Udi = source.Udi;
-            device.Expiry = source.Expiry;
-            device.LotNumber = source.LotNumber;
-            device.PatientReference = source.Patient.Reference;
+            if (source.Manufacturer != null)
+                device.Manufacturer = source.Manufacturer;
+            if (source.Model != null)
+                device.Model = source.Model;
+            if (source.Udi != null)
+                device.Udi = source.Udi;
+            if (source.Expiry != null)
+                device.Expiry = source.Expiry;
+            if (source.LotNumber != null)
+                device.LotNumber = source.LotNumber;
+            if (source.Patient != null)
+                device.PatientReference = source.Patient.Reference;
 
             return device;
         }
@@ -65,14 +77,14 @@ namespace ServerExperiment.Models.FHIR.Mappers
         /// </summary>
         /// <param name="device"></param>
         /// <returns></returns>
-        public static Hl7.Fhir.Model.Device MapModel(Models.Device device)
+        public static Device MapModel(POCO.Device device)
         {
             if (device == null)
             {
                 throw new ArgumentNullException("device");
             }
 
-            var resource = new Hl7.Fhir.Model.Device();
+            var resource = new Device();
 
             resource.Id = device.DeviceId.ToString("D");
 

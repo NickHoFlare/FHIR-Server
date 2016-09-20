@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Description;
-using ServerExperiment.Models;
 using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
+using ServerExperiment.Models.POCO;
+using ServerExperiment.Models;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
@@ -64,6 +62,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Device device = DeviceMapper.MapResource(fhirDevice);
+            ControllerUtils.AddMetadata(device, ControllerUtils.UPDATE);
 
             db.Entry(device).State = EntityState.Modified;
 
@@ -96,7 +95,8 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Models.Device device = DeviceMapper.MapResource(fhirDevice);
+            Device device = DeviceMapper.MapResource(fhirDevice);
+            ControllerUtils.AddMetadata(device, ControllerUtils.CREATE);
 
             db.Devices.Add(device);
             db.SaveChanges();
@@ -122,6 +122,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
+            ControllerUtils.AddMetadata(device, ControllerUtils.DELETE);
 
             db.Devices.Remove(device);
             db.SaveChanges();

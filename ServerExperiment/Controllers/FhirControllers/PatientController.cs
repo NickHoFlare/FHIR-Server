@@ -5,11 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Description;
-using ServerExperiment.Models;
-using ServerExperiment.Models.FHIR.Mappers;
 using System.Text;
 using ServerExperiment.Controllers.FhirControllers;
+using ServerExperiment.Models.POCO;
+using ServerExperiment.POCO.FHIR.Mappers;
+using ServerExperiment.Models;
 
 namespace ServerExperiment.Controllers
 {
@@ -63,6 +63,7 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
+            ControllerUtils.AddMetadata(patient, ControllerUtils.UPDATE);
 
             db.Entry(patient).State = EntityState.Modified;
 
@@ -95,7 +96,8 @@ namespace ServerExperiment.Controllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Models.Patient patient = PatientMapper.MapResource(fhirPatient);
+            Patient patient = PatientMapper.MapResource(fhirPatient);
+            ControllerUtils.AddMetadata(patient, ControllerUtils.CREATE);
 
             db.Patients.Add(patient);
             db.SaveChanges();
@@ -121,6 +123,7 @@ namespace ServerExperiment.Controllers
                 message.Content = new StringContent("Patient with id " + patientId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
+            ControllerUtils.AddMetadata(patient, ControllerUtils.DELETE);
 
             db.Patients.Remove(patient);
             db.SaveChanges();

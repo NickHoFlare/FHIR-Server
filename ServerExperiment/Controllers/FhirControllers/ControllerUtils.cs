@@ -1,4 +1,6 @@
 ﻿using Hl7.Fhir.Serialization;
+using ServerExperiment.Models;
+using ServerExperiment.Models.POCO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,5 +44,32 @@ namespace ServerExperiment.Controllers.FhirControllers
             return payload;
         }
 
+        public static IModel AddMetadata(IModel model, string action)
+        {
+            IModel updatedModel = model;
+
+            updatedModel.RecordId++;
+            updatedModel.LastModified = DateTime.UtcNow;
+            
+            if (action == CREATE)
+            {
+                updatedModel.Action = CREATE;
+                updatedModel.IsDeleted = false;
+                updatedModel.VersionId = 1;
+            }
+            else if (action == UPDATE)
+            {
+                updatedModel.Action = UPDATE;
+                updatedModel.IsDeleted = false;
+                updatedModel.VersionId++;
+            }
+            else if (action == DELETE)
+            {
+                updatedModel.Action = DELETE;
+                updatedModel.IsDeleted = true;
+            }
+
+            return updatedModel;
+        }
     }
 }
