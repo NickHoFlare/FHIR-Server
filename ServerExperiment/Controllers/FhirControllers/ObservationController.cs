@@ -62,7 +62,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
-            ControllerUtils.AddMetadata(observation, ControllerUtils.UPDATE);
+            observation = (Observation)ControllerUtils.AddMetadata(observation, ControllerUtils.UPDATE);
 
             db.Entry(observation).State = EntityState.Modified;
 
@@ -84,7 +84,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 }
             }
 
-            message.StatusCode = HttpStatusCode.NoContent;
+            message.StatusCode = HttpStatusCode.OK;
             return message;
         }
 
@@ -96,7 +96,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
-            ControllerUtils.AddMetadata(observation, ControllerUtils.CREATE);
+            observation = (Observation)ControllerUtils.AddMetadata(observation, ControllerUtils.CREATE);
 
             db.Observations.Add(observation);
             db.SaveChanges();
@@ -122,7 +122,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            ControllerUtils.AddMetadata(observation, ControllerUtils.DELETE);
+            observation = (Observation)ControllerUtils.AddMetadata(observation, ControllerUtils.DELETE);
 
             db.Observations.Remove(observation);
             db.SaveChanges();

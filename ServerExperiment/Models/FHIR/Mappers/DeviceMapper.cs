@@ -24,6 +24,8 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             POCO.Device device = new POCO.Device();
 
+            device.DeviceId = int.Parse(resource.Id);
+
             // Device Type
             if (source.Type != null)
             {

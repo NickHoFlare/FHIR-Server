@@ -25,6 +25,8 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             POCO.Observation observation = new POCO.Observation();
 
+            observation.ObservationId = int.Parse(resource.Id);
+
             // observation Status
             var status = source.Status.GetValueOrDefault();
             switch (status)

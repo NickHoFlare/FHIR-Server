@@ -48,7 +48,8 @@ namespace ServerExperiment.Models
                 Active = true,
                 Deceased = false
             });
-            defaultPatients.Add(new Patient() { RecordId = 2,
+            defaultPatients.Add(new Patient() {
+                RecordId = 2,
                 Nationality = "Australian",
                 LastModified = DateTime.UtcNow,
                 IsDeleted = false,
