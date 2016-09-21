@@ -63,7 +63,8 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
-            patient = (Patient)ControllerUtils.AddMetadata(patient, ControllerUtils.UPDATE);
+
+            //PatientRecord record = ControllerUtils.AddMetadata(patient, ControllerUtils.UPDATE);
 
             db.Entry(patient).State = EntityState.Modified;
 
@@ -97,9 +98,17 @@ namespace ServerExperiment.Controllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
-            patient = (Patient)ControllerUtils.AddMetadata(patient, ControllerUtils.CREATE);
+            patient.VersionId = 1;
+            patient.IsDeleted = false;
 
             db.Patients.Add(patient);
+            db.SaveChanges();
+
+            PatientRecord record = new PatientRecord();
+            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            record.Patient = patient;
+
+            db.PatientRecords.Add(record);
             db.SaveChanges();
 
             message.Content = new StringContent("Patient created!", Encoding.UTF8, "text/html");
@@ -123,7 +132,7 @@ namespace ServerExperiment.Controllers
                 message.Content = new StringContent("Patient with id " + patientId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            patient = (Patient)ControllerUtils.AddMetadata(patient, ControllerUtils.DELETE);
+            //patient = (Patient)ControllerUtils.AddMetadata(patient, ControllerUtils.DELETE); //TODO: FIX
 
             db.Patients.Remove(patient);
             db.SaveChanges();

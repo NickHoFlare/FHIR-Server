@@ -62,7 +62,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Device device = DeviceMapper.MapResource(fhirDevice);
-            device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.UPDATE);
+            //device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.UPDATE);
 
             db.Entry(device).State = EntityState.Modified;
 
@@ -96,7 +96,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Device device = DeviceMapper.MapResource(fhirDevice);
-            device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.CREATE);
+            //device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.CREATE);
 
             db.Devices.Add(device);
             db.SaveChanges();
@@ -122,7 +122,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.DELETE);
+            //device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.DELETE);
 
             db.Devices.Remove(device);
             db.SaveChanges();

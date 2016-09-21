@@ -44,32 +44,28 @@ namespace ServerExperiment.Controllers.FhirControllers
             return payload;
         }
 
-        public static IModel AddMetadata(IModel model, string action)
+        public static IRecord AddMetadata(IRecord record, string action)
         {
-            IModel updatedModel = model;
+            IRecord updatedRecord = record;
 
-            updatedModel.RecordId++;
-            updatedModel.LastModified = DateTime.UtcNow;
+            updatedRecord.LastModified = DateTime.UtcNow;
             
             if (action == CREATE)
             {
-                updatedModel.Action = CREATE;
-                updatedModel.IsDeleted = false;
-                updatedModel.VersionId = 1;
+                updatedRecord.Action = CREATE;
+                updatedRecord.VersionId = 1;
             }
             else if (action == UPDATE)
             {
-                updatedModel.Action = UPDATE;
-                updatedModel.IsDeleted = false;
-                updatedModel.VersionId++;
+                updatedRecord.Action = UPDATE;
+                updatedRecord.VersionId++;
             }
             else if (action == DELETE)
             {
-                updatedModel.Action = DELETE;
-                updatedModel.IsDeleted = true;
+                updatedRecord.Action = DELETE;
             }
 
-            return updatedModel;
+            return updatedRecord;
         }
     }
 }

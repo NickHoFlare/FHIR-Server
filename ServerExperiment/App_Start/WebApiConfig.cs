@@ -31,16 +31,31 @@ namespace ServerExperiment
                 routeTemplate: "fhir/Patient/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+            config.Routes.MapHttpRoute(
+                name: "SpecificPatientRecord",
+                routeTemplate: "fhir/PatientRecord/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
 
             config.Routes.MapHttpRoute(
                 name: "SpecificDevice",
                 routeTemplate: "fhir/Device/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+            config.Routes.MapHttpRoute(
+                name: "SpecificDeviceRecord",
+                routeTemplate: "fhir/DeviceRecord/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
 
             config.Routes.MapHttpRoute(
                 name: "SpecificObservation",
                 routeTemplate: "fhir/Observation/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+            config.Routes.MapHttpRoute(
+                name: "SpecificObservationRecord",
+                routeTemplate: "fhir/ObservationRecord/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
         }

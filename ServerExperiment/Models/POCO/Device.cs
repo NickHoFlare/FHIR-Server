@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServerExperiment.Models.POCO
 {
-    public class Device : IModel
+    public class Device
 	{
         public Device()
         {

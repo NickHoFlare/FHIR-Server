@@ -7,7 +7,7 @@ using ServerExperiment.Controllers.FhirControllers;
 
 namespace ServerExperiment.Models.POCO
 {
-    public class Observation : IModel
+    public class Observation
     {
         public Observation()
         {

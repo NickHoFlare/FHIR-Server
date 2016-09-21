@@ -7,15 +7,12 @@ using System.Linq;
 
 namespace ServerExperiment.Models.POCO
 {
-    public class Patient : IModel
+    public class Patient
 	{
         public Patient()
         {
-            RecordId = 0;
-            VersionId = 0;
-            LastModified = DateTime.UtcNow;
-            Action = ControllerUtils.UNASSIGNED;
             IsDeleted = false;
+            VersionId = 0;
 
             PatientId = 0;
             Birthday = DateTime.UtcNow;
@@ -36,13 +33,8 @@ namespace ServerExperiment.Models.POCO
             _periodEnds = new List<string>();
         }
 
-        // Each Record is immutable, in case of updates we create a new record and 
-        // keep track of Version, Time of modification and action type like CREATE/UPDATE
-        public int RecordId { get; set; }
-        public int VersionId { get; set; }
-        public DateTime LastModified { get; set; }
-        public string Action { get; set; }
         public bool IsDeleted { get; set; }
+        public int VersionId { get; set; }
 
         // Logical Identifier
         [Key]

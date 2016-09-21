@@ -28,9 +28,7 @@ namespace ServerExperiment.Models
 
             defaultPatients.Add(new Patient());
             defaultPatients.Add(new Patient() {
-                RecordId = 1,
                 Nationality = "Blablabla",
-                LastModified = DateTime.UtcNow,
                 IsDeleted = false,
                 VersionId = 1,
                 FirstNamesSerialised = firstNames,
@@ -49,9 +47,7 @@ namespace ServerExperiment.Models
                 Deceased = false
             });
             defaultPatients.Add(new Patient() {
-                RecordId = 2,
                 Nationality = "Australian",
-                LastModified = DateTime.UtcNow,
                 IsDeleted = false,
                 VersionId = 1,
                 FirstNamesSerialised = firstNames,
