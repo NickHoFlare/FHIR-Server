@@ -11,10 +11,7 @@ namespace ServerExperiment.Models.POCO
     {
         public Observation()
         {
-            RecordId = 0;
             VersionId = 0;
-            LastModified = DateTime.UtcNow;
-            Action = ControllerUtils.UNASSIGNED;
             IsDeleted = false;
 
             ObservationId = 0;
@@ -56,10 +53,7 @@ namespace ServerExperiment.Models.POCO
 
         // Each Record is immutable, in case of updates we create a new record and 
         // keep track of Version, Time of modification and action type like CREATE/UPDATE
-        public int RecordId { get; set; }
         public int VersionId { get; set; }
-        public DateTime LastModified { get; set; }
-        public string Action { get; set; }
         public bool IsDeleted { get; set; }
 
         // Logical Identifier
