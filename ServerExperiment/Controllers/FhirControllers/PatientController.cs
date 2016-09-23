@@ -38,6 +38,12 @@ namespace ServerExperiment.Controllers
                 message.Content = new StringContent("Patient with id "+patientId+" not found!", Encoding.UTF8, "text/html");
                 return message;
             }
+            else if (patient.IsDeleted == true)
+            {
+                message.StatusCode = HttpStatusCode.Gone;
+                message.Content = new StringContent("Patient with id " + patientId + " has been deleted!", Encoding.UTF8, "text/html");
+                return message;
+            }
 
             Hl7.Fhir.Model.Patient fhirPatient = PatientMapper.MapModel(patient);
             string fixedFormat = ControllerUtils.FixMimeString(_format);
@@ -63,7 +69,16 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
+            /*
+            Patient oldPatient = db.Patients.Find(patientId);
 
+            if (oldPatient.IsDeleted == true)
+            {
+                message.StatusCode = HttpStatusCode.Gone;
+                message.Content = new StringContent("Patient with id " + patientId + " has been deleted!", Encoding.UTF8, "text/html");
+                return message;
+            }
+            */
             db.Entry(patient).State = EntityState.Modified;
 
             PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
@@ -91,6 +106,7 @@ namespace ServerExperiment.Controllers
             }
 
             message.StatusCode = HttpStatusCode.OK;
+            message.Content = new StringContent("Patient with id " + patientId + " has been modified!", Encoding.UTF8, "text/html");
             return message;
         }
 
@@ -135,11 +151,25 @@ namespace ServerExperiment.Controllers
                 message.Content = new StringContent("Patient with id " + patientId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
+            else if (patient.IsDeleted == true)
+            {
+                message.StatusCode = HttpStatusCode.Gone;
+                message.Content = new StringContent("Patient with id " + patientId + " has already been deleted!", Encoding.UTF8, "text/html");
+                return message;
+            }
 
-            db.Patients.Remove(patient);
+            patient.IsDeleted = true;
+
+            db.Entry(patient).State = EntityState.Modified;
+
+            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
+            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            record.Patient = patient;
+
+            db.PatientRecords.Add(record);
             db.SaveChanges();
 
-            message.StatusCode = HttpStatusCode.OK;
+            message.StatusCode = HttpStatusCode.NoContent;
             return message;
         }
 
