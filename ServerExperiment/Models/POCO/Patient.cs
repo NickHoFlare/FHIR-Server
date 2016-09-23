@@ -12,7 +12,6 @@ namespace ServerExperiment.Models.POCO
         public Patient()
         {
             IsDeleted = false;
-            VersionId = 0;
 
             PatientId = 0;
             Birthday = DateTime.UtcNow;

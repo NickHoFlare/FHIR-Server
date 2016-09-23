@@ -30,7 +30,6 @@ namespace ServerExperiment.Models
             defaultPatients.Add(new Patient() {
                 Nationality = "Blablabla",
                 IsDeleted = false,
-                VersionId = 1,
                 FirstNamesSerialised = firstNames,
                 LastNamesSerialised = lastNames,
                 Birthday = DateTime.Parse("22/03/1991"),
@@ -49,7 +48,6 @@ namespace ServerExperiment.Models
             defaultPatients.Add(new Patient() {
                 Nationality = "Australian",
                 IsDeleted = false,
-                VersionId = 1,
                 FirstNamesSerialised = firstNames,
                 LastNamesSerialised = lastNames,
                 Birthday = DateTime.Parse("22/03/1991"),

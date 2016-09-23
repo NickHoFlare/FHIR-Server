@@ -64,8 +64,6 @@ namespace ServerExperiment.Controllers
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
 
-            //PatientRecord record = ControllerUtils.AddMetadata(patient, ControllerUtils.UPDATE);
-
             db.Entry(patient).State = EntityState.Modified;
 
             try
@@ -86,7 +84,14 @@ namespace ServerExperiment.Controllers
                 }
             }
 
-            message.StatusCode = HttpStatusCode.NoContent;
+            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
+            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            record.Patient = patient;
+
+            db.PatientRecords.Add(record);
+            db.SaveChanges();
+
+            message.StatusCode = HttpStatusCode.OK;
             return message;
         }
 
@@ -98,7 +103,6 @@ namespace ServerExperiment.Controllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
-            patient.VersionId = 1;
             patient.IsDeleted = false;
 
             db.Patients.Add(patient);
