@@ -66,6 +66,12 @@ namespace ServerExperiment.Controllers
 
             db.Entry(patient).State = EntityState.Modified;
 
+            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
+            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            record.Patient = patient;
+
+            db.PatientRecords.Add(record);
+
             try
             {
                 db.SaveChanges();
@@ -83,13 +89,6 @@ namespace ServerExperiment.Controllers
                     throw;
                 }
             }
-
-            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
-            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
-            record.Patient = patient;
-
-            db.PatientRecords.Add(record);
-            db.SaveChanges();
 
             message.StatusCode = HttpStatusCode.OK;
             return message;
@@ -136,7 +135,6 @@ namespace ServerExperiment.Controllers
                 message.Content = new StringContent("Patient with id " + patientId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            //patient = (Patient)ControllerUtils.AddMetadata(patient, ControllerUtils.DELETE); //TODO: FIX
 
             db.Patients.Remove(patient);
             db.SaveChanges();
