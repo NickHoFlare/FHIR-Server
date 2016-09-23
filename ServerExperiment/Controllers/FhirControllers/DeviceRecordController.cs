@@ -17,13 +17,17 @@ namespace ServerExperiment.Controllers.FhirControllers
     {
         private FhirResourceContext db = new FhirResourceContext();
 
-        // GET: api/DeviceRecord
+        // GET: fhir/DeviceRecord
+        [Route("fhir/DeviceRecord")]
+        [HttpGet]
         public IQueryable<DeviceRecord> GetDeviceRecords()
         {
             return db.DeviceRecords;
         }
 
-        // GET: api/DeviceRecord/5
+        // GET: fhir/DeviceRecord/5
+        [Route("fhir/DeviceRecord/{id}")]
+        [HttpGet]
         [ResponseType(typeof(DeviceRecord))]
         public IHttpActionResult GetDeviceRecord(int id)
         {
@@ -35,6 +39,8 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             return Ok(deviceRecord);
         }
+
+        // Methods below are probably not going to be used.
 
         // PUT: api/DeviceRecord/5
         [ResponseType(typeof(void))]

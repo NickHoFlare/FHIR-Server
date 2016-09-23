@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using ServerExperiment.Models;
@@ -17,13 +13,17 @@ namespace ServerExperiment.Controllers.FhirControllers
     {
         private FhirResourceContext db = new FhirResourceContext();
 
-        // GET: api/ObservationRecord
+        // GET: fhir/ObservationRecord
+        [Route("fhir/ObservationRecord")]
+        [HttpGet]
         public IQueryable<ObservationRecord> GetObservationRecords()
         {
             return db.ObservationRecords;
         }
 
-        // GET: api/ObservationRecord/5
+        // GET: fhir/ObservationRecord/5
+        [Route("fhir/ObservationRecord/5")]
+        [HttpGet]
         [ResponseType(typeof(ObservationRecord))]
         public IHttpActionResult GetObservationRecord(int id)
         {
@@ -35,6 +35,8 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             return Ok(observationRecord);
         }
+
+        // Methods below are probably not going to be used.
 
         // PUT: api/ObservationRecord/5
         [ResponseType(typeof(void))]

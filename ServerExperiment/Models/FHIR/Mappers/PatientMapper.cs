@@ -23,7 +23,9 @@ namespace ServerExperiment.POCO.FHIR.Mappers
 
             Models.POCO.Patient patient = new Models.POCO.Patient();
 
-            patient.PatientId = int.Parse(resource.Id);
+            int resultId = 0;
+            int.TryParse(resource.Id, out resultId);
+            patient.PatientId = resultId;
 
             patient.Active = source.Active ?? true; // Set to value of source.Active. if null, set to true.
             var deceased = source.Deceased as FhirBoolean;

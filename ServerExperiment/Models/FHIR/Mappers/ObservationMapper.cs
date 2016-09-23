@@ -25,7 +25,9 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             POCO.Observation observation = new POCO.Observation();
 
-            observation.ObservationId = int.Parse(resource.Id);
+            int resultId = 0;
+            int.TryParse(resource.Id, out resultId);
+            observation.ObservationId = resultId;
 
             // observation Status
             var status = source.Status.GetValueOrDefault();
