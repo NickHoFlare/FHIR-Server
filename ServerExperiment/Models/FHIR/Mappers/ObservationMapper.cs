@@ -225,7 +225,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     }
                     else if (component.Value is SampledData)
                     {
-                        var value = source.Value as SampledData;
+                        var value = component.Value as SampledData;
                         observation.ValueSampledDataOriginCode.Add(value.Origin.Code);
                         observation.ValueSampledDataOriginSystem.Add(value.Origin.System);
                         observation.ValueSampledDataOriginUnit.Add(value.Origin.Unit);

@@ -69,17 +69,9 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
-            /*
-            Patient oldPatient = db.Patients.Find(patientId);
 
-            if (oldPatient.IsDeleted == true)
-            {
-                message.StatusCode = HttpStatusCode.Gone;
-                message.Content = new StringContent("Patient with id " + patientId + " has been deleted!", Encoding.UTF8, "text/html");
-                return message;
-            }
-            */
             db.Entry(patient).State = EntityState.Modified;
+            //db.SaveChanges();
 
             PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
             record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);

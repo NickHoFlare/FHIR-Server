@@ -31,7 +31,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             // Device Type
             if (source.Type != null)
             {
-                if (source.Type.Coding != null)
+                if (source.Type.Coding != null && source.Type.Coding.Count > 0)
                 {
                     device.TypeCode = source.Type.Coding.FirstOrDefault().Code;
                     device.TypeDisplay = source.Type.Coding.FirstOrDefault().Display;

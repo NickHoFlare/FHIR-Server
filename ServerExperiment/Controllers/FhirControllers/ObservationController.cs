@@ -37,6 +37,12 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
+            else if (observation.IsDeleted == true)
+            {
+                message.StatusCode = HttpStatusCode.Gone;
+                message.Content = new StringContent("Observation with id " + observationId + " has been deleted!", Encoding.UTF8, "text/html");
+                return message;
+            }
 
             Hl7.Fhir.Model.Observation fhirObservation = ObservationMapper.MapModel(observation);
             string fixedFormat = ControllerUtils.FixMimeString(_format);
@@ -62,9 +68,15 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
-            //observation = (Observation)ControllerUtils.AddMetadata(observation, ControllerUtils.UPDATE);
 
             db.Entry(observation).State = EntityState.Modified;
+            //db.SaveChanges();
+
+            ObservationRecord record = db.ObservationRecords.Where(rec => rec.ObservationId == observationId).OrderByDescending(rec => rec.LastModified).First();
+            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            record.Observation = observation;
+
+            db.ObservationRecords.Add(record);
 
             try
             {
@@ -85,6 +97,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             message.StatusCode = HttpStatusCode.OK;
+            message.Content = new StringContent("Patient with id " + observationId + " has been modified!", Encoding.UTF8, "text/html");
             return message;
         }
 
@@ -96,9 +109,16 @@ namespace ServerExperiment.Controllers.FhirControllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
-            //observation = (Observation)ControllerUtils.AddMetadata(observation, ControllerUtils.CREATE);
+            observation.IsDeleted = false;
 
             db.Observations.Add(observation);
+            db.SaveChanges();
+
+            ObservationRecord record = new ObservationRecord();
+            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            record.Observation = observation;
+
+            db.ObservationRecords.Add(record);
             db.SaveChanges();
 
             message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
@@ -122,9 +142,22 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            //observation = (Observation)ControllerUtils.AddMetadata(observation, ControllerUtils.DELETE);
+            else if (observation.IsDeleted == true)
+            {
+                message.StatusCode = HttpStatusCode.Gone;
+                message.Content = new StringContent("Patient with id " + observationId + " has already been deleted!", Encoding.UTF8, "text/html");
+                return message;
+            }
 
-            db.Observations.Remove(observation);
+            observation.IsDeleted = true;
+
+            db.Entry(observation).State = EntityState.Modified;
+
+            ObservationRecord record = db.ObservationRecords.Where(rec => rec.ObservationId == observationId).OrderByDescending(rec => rec.LastModified).First();
+            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            record.Observation = observation;
+
+            db.ObservationRecords.Add(record);
             db.SaveChanges();
 
             message.StatusCode = HttpStatusCode.NoContent;

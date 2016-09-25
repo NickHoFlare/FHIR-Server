@@ -37,6 +37,12 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
+            else if (device.IsDeleted == true)
+            {
+                message.StatusCode = HttpStatusCode.Gone;
+                message.Content = new StringContent("Device with id " + deviceId + " has been deleted!", Encoding.UTF8, "text/html");
+                return message;
+            }
 
             Hl7.Fhir.Model.Device fhirDevice = DeviceMapper.MapModel(device);
             string fixedFormat = ControllerUtils.FixMimeString(_format);
@@ -62,9 +68,14 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Device device = DeviceMapper.MapResource(fhirDevice);
-            //device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.UPDATE);
 
             db.Entry(device).State = EntityState.Modified;
+
+            DeviceRecord record = db.DeviceRecords.Where(rec => rec.DeviceId == deviceId).OrderByDescending(rec => rec.LastModified).First();
+            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            record.Device = device;
+
+            db.DeviceRecords.Add(record);
 
             try
             {
@@ -85,6 +96,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             message.StatusCode = HttpStatusCode.OK;
+            message.Content = new StringContent("Device with id " + deviceId + " has been modified!", Encoding.UTF8, "text/html");
             return message;
         }
 
@@ -96,9 +108,16 @@ namespace ServerExperiment.Controllers.FhirControllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Device device = DeviceMapper.MapResource(fhirDevice);
-            //device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.CREATE);
+            device.IsDeleted = false;
 
             db.Devices.Add(device);
+            db.SaveChanges();
+
+            DeviceRecord record = new DeviceRecord();
+            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            record.Device = device;
+
+            db.DeviceRecords.Add(record);
             db.SaveChanges();
 
             message.Content = new StringContent("Device created!", Encoding.UTF8, "text/html");
@@ -122,9 +141,22 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            //device = (Device)ControllerUtils.AddMetadata(device, ControllerUtils.DELETE);
+            else if (device.IsDeleted == true)
+            {
+                message.StatusCode = HttpStatusCode.Gone;
+                message.Content = new StringContent("Device with id " + deviceId + " has already been deleted!", Encoding.UTF8, "text/html");
+                return message;
+            }
 
-            db.Devices.Remove(device);
+            device.IsDeleted = true;
+
+            db.Entry(device).State = EntityState.Modified;
+
+            DeviceRecord record = db.DeviceRecords.Where(rec => rec.DeviceId == deviceId).OrderByDescending(rec => rec.LastModified).First();
+            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            record.Device = device;
+
+            db.DeviceRecords.Add(record);
             db.SaveChanges();
 
             message.StatusCode = HttpStatusCode.NoContent;

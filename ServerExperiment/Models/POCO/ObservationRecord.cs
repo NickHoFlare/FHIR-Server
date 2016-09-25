@@ -35,7 +35,7 @@ namespace ServerExperiment.Models.POCO
         public int ObservationId { get; set; }
 
         [ForeignKey("ObservationId")]
-        public Observation observation { get; set; }
+        public Observation Observation { get; set; }
 
         // Record metadata
         public int VersionId { get; set; }

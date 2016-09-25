@@ -389,14 +389,24 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> sampledDataValues = value.Split(';').ToList();
-                if (sampledDataValues[0] == string.Empty)
+                List<string> sampledDataValues;
+
+                if (value != null)
                 {
-                    _valueSampledDataOriginValue = null;
+                    sampledDataValues = value.Split(';').ToList();
+
+                    if (sampledDataValues[0] == string.Empty)
+                    {
+                        _valueSampledDataOriginValue = null;
+                    }
+                    else
+                    {
+                        _valueSampledDataOriginValue = sampledDataValues.Select(decimal.Parse).ToList();
+                    }
                 }
                 else
                 {
-                    _valueSampledDataOriginValue = sampledDataValues.Select(decimal.Parse).ToList();
+                    _valueSampledDataOriginValue = null;
                 }
 
                 //_ValueSampledDataOriginValue = value.Split(';').ToList().Select(decimal.Parse).ToList(); 
@@ -420,14 +430,24 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> sampledDataPeriods = value.Split(';').ToList();
-                if (sampledDataPeriods[0] == string.Empty)
+                List<string> sampledDataPeriods;
+
+                if (value != null)
                 {
-                    _valueSampledDataPeriod = null;
+                    sampledDataPeriods = value.Split(';').ToList();
+
+                    if (sampledDataPeriods[0] == string.Empty)
+                    {
+                        _valueSampledDataPeriod = null;
+                    }
+                    else
+                    {
+                        _valueSampledDataPeriod = sampledDataPeriods.Select(decimal.Parse).ToList();
+                    }
                 }
                 else
                 {
-                    _valueSampledDataPeriod = sampledDataPeriods.Select(decimal.Parse).ToList();
+                    _valueSampledDataPeriod = null;
                 }
 
                 //_valueSampledDataPeriod = value.Split(';').ToList().Select(decimal.Parse).ToList();
@@ -451,14 +471,24 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> sampledDataDimensions = value.Split(';').ToList();
-                if (sampledDataDimensions[0] == string.Empty)
+                List<string> sampledDataDimensions;
+
+                if (value != null)
                 {
-                    _valueSampledDataDimensions = null;
+                    sampledDataDimensions = value.Split(';').ToList();
+
+                    if (sampledDataDimensions[0] == string.Empty)
+                    {
+                        _valueSampledDataDimensions = null;
+                    }
+                    else
+                    {
+                        _valueSampledDataDimensions = sampledDataDimensions.Select(int.Parse).ToList();
+                    }
                 }
                 else
                 {
-                    _valueSampledDataDimensions = sampledDataDimensions.Select(int.Parse).ToList();
+                    _valueSampledDataDimensions = null;
                 }
 
                 //_valueSampledDataDimensions = value.Split(';').ToList().Select(int.Parse).ToList();
@@ -494,14 +524,24 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> valuePeriodStarts = value.Split(';').ToList();
-                if (valuePeriodStarts[0] == string.Empty)
+                List<string> valuePeriodStarts;
+
+                if (value != null)
                 {
-                    _valuePeriodStart = null;
+                    valuePeriodStarts = value.Split(';').ToList();
+
+                    if (valuePeriodStarts[0] == string.Empty)
+                    {
+                        _valuePeriodStart = null;
+                    }
+                    else
+                    {
+                        _valuePeriodStart = valuePeriodStarts.Select(DateTime.Parse).ToList();
+                    }
                 }
                 else
                 {
-                    _valuePeriodStart = valuePeriodStarts.Select(DateTime.Parse).ToList();
+                    _valuePeriodStart = null;
                 }
 
                 //_valuePeriodStart = value.Split(';').ToList().Select(DateTime.Parse).ToList();
@@ -525,14 +565,24 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> valuePeriodEnds = value.Split(';').ToList();
-                if (valuePeriodEnds[0] == string.Empty)
+                List<string> valuePeriodEnds;
+
+                if (value != null)
                 {
-                    _valuePeriodEnd = null;
+                    valuePeriodEnds = value.Split(';').ToList();
+
+                    if (valuePeriodEnds[0] == string.Empty)
+                    {
+                        _valuePeriodEnd = null;
+                    }
+                    else
+                    {
+                        _valuePeriodEnd = valuePeriodEnds.Select(DateTime.Parse).ToList();
+                    }
                 }
                 else
                 {
-                    _valuePeriodEnd = valuePeriodEnds.Select(DateTime.Parse).ToList();
+                    _valuePeriodEnd = null;
                 }
 
                 //_valuePeriodEnd = value.Split(';').ToList().Select(DateTime.Parse).ToList();
