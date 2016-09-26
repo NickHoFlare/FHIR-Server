@@ -9,7 +9,6 @@ using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
 using ServerExperiment.Models.POCO;
 using ServerExperiment.Models;
-using ServerExperiment.Utils;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
@@ -27,7 +26,6 @@ namespace ServerExperiment.Controllers.FhirControllers
         // GET: fhir/Observation/5
         [Route("fhir/Observation/{observationId}")]
         [HttpGet]
-        [RequireHttps]
         public HttpResponseMessage Read(int observationId, string _format = "application/xml+FHIR", bool _summary = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -58,7 +56,6 @@ namespace ServerExperiment.Controllers.FhirControllers
         // PUT: fhir/Observation/5
         [Route("fhir/Observation/{observationId}")]
         [HttpPut]
-        [RequireHttps]
         public HttpResponseMessage Update(Hl7.Fhir.Model.Observation fhirObservation, int observationId)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -73,7 +70,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             Observation observation = ObservationMapper.MapResource(fhirObservation);
 
             db.Entry(observation).State = EntityState.Modified;
-            //db.SaveChanges(); // do testing later to verify that having one savechanges is faster than having 2
+            //db.SaveChanges();
 
             ObservationRecord record = db.ObservationRecords.Where(rec => rec.ObservationId == observationId).OrderByDescending(rec => rec.LastModified).First();
             record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
@@ -107,7 +104,6 @@ namespace ServerExperiment.Controllers.FhirControllers
         // POST: fhir/Observation
         [Route("fhir/Observation")]
         [HttpPost]
-        [RequireHttps]
         public HttpResponseMessage Create(Hl7.Fhir.Model.Observation fhirObservation)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -135,7 +131,6 @@ namespace ServerExperiment.Controllers.FhirControllers
         // DELETE: fhir/Observation/5
         [Route("fhir/Observation/{observationId}")]
         [HttpDelete]
-        [RequireHttps]
         public HttpResponseMessage Delete(int observationId)
         {
             HttpResponseMessage message = new HttpResponseMessage();

@@ -10,7 +10,6 @@ using ServerExperiment.Controllers.FhirControllers;
 using ServerExperiment.Models.POCO;
 using ServerExperiment.POCO.FHIR.Mappers;
 using ServerExperiment.Models;
-using ServerExperiment.Utils;
 
 namespace ServerExperiment.Controllers
 {
@@ -28,7 +27,6 @@ namespace ServerExperiment.Controllers
         // GET: fhir/Patient/5
         [Route("fhir/Patient/{patientId}")]
         [HttpGet]
-        [RequireHttps]
         public HttpResponseMessage Read(int patientId, string _format = "application/xml+FHIR", bool _summary = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -59,7 +57,6 @@ namespace ServerExperiment.Controllers
         // PUT: fhir/Patient/5
         [Route("fhir/Patient/{patientId}")]
         [HttpPut]
-        [RequireHttps]
         public HttpResponseMessage Update(Hl7.Fhir.Model.Patient fhirPatient, int patientId)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -108,7 +105,6 @@ namespace ServerExperiment.Controllers
         // POST: fhir/Patient
         [Route("fhir/Patient")]
         [HttpPost]
-        [RequireHttps]
         public HttpResponseMessage Create(Hl7.Fhir.Model.Patient fhirPatient)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -136,7 +132,6 @@ namespace ServerExperiment.Controllers
         // DELETE: fhir/Patient/5
         [Route("fhir/Patient/{patientId}")]
         [HttpDelete]
-        [RequireHttps]
         public HttpResponseMessage Delete(int patientId)
         {
             HttpResponseMessage message = new HttpResponseMessage();
