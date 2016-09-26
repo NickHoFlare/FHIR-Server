@@ -18,13 +18,6 @@ namespace ServerExperiment.Controllers
     {
         private FhirResourceContext db = new FhirResourceContext();
         
-        // GET: fhir/Patient
-        // This will not exist in final FHIR implementation.
-        public IQueryable<Patient> GetPatients()
-        {
-            return db.Patients;
-        }
-
         // GET: fhir/Patient/5
         [Route("fhir/Patient/{patientId}")]
         [HttpGet]

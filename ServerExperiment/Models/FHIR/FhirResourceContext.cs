@@ -17,13 +17,12 @@ namespace ServerExperiment.Models
             Database.SetInitializer<FhirResourceContext>(new DropCreateDatabaseAlways<FhirResourceContext>());
         }
 
-        public System.Data.Entity.DbSet<Patient> Patients { get; set; }
-        public System.Data.Entity.DbSet<Device> Devices { get; set; }
-        public System.Data.Entity.DbSet<Observation> Observations { get; set; }
-        public System.Data.Entity.DbSet<PatientRecord> PatientRecords { get; set; }
+        public DbSet<Patient> Patients { get; set; }
+        public DbSet<Device> Devices { get; set; }
+        public DbSet<Observation> Observations { get; set; }
 
-        public System.Data.Entity.DbSet<ServerExperiment.Models.POCO.DeviceRecord> DeviceRecords { get; set; }
-
-        public System.Data.Entity.DbSet<ServerExperiment.Models.POCO.ObservationRecord> ObservationRecords { get; set; }
+        public DbSet<PatientRecord> PatientRecords { get; set; }
+        public DbSet<DeviceRecord> DeviceRecords { get; set; }
+        public DbSet<ObservationRecord> ObservationRecords { get; set; }
     }
 }

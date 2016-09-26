@@ -17,13 +17,6 @@ namespace ServerExperiment.Controllers.FhirControllers
     {
         private FhirResourceContext db = new FhirResourceContext();
 
-        // GET: fhir/Observation
-        // This will not exist in final FHIR implementation.
-        public IQueryable<Observation> GetObservations()
-        {
-            return db.Observations;
-        }
-
         // GET: fhir/Observation/5
         [Route("fhir/Observation/{observationId}")]
         [HttpGet]
