@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using ServerExperiment.Models;
 using ServerExperiment.Models.POCO;
+using ServerExperiment.Utils;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
@@ -20,6 +21,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // GET: fhir/PatientRecord
         [Route("fhir/PatientRecord")]
         [HttpGet]
+        [RequireHttps]
         public IQueryable<PatientRecord> GetPatientRecords()
         {
             return db.PatientRecords;
@@ -28,6 +30,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // GET: fhir/PatientRecord/5
         [Route("fhir/PatientRecord/{id}")]
         [HttpGet]
+        [RequireHttps]
         [ResponseType(typeof(PatientRecord))]
         public IHttpActionResult GetPatientRecord(int id)
         {

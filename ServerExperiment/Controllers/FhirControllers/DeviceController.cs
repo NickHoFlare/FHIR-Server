@@ -9,6 +9,7 @@ using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
 using ServerExperiment.Models.POCO;
 using ServerExperiment.Models;
+using ServerExperiment.Utils;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
@@ -26,6 +27,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // GET: fhir/Device/5
         [Route("fhir/Device/{deviceId}")]
         [HttpGet]
+        [RequireHttps]
         public HttpResponseMessage Read(int deviceId, string _format = "application/xml+FHIR", bool _summary = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -56,6 +58,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // PUT: fhir/Device/5
         [Route("fhir/Device/{deviceId}")]
         [HttpPut]
+        [RequireHttps]
         public HttpResponseMessage Update(Hl7.Fhir.Model.Device fhirDevice, int deviceId)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -103,6 +106,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // POST: fhir/Device
         [Route("fhir/Device")]
         [HttpPost]
+        [RequireHttps]
         public HttpResponseMessage Create(Hl7.Fhir.Model.Device fhirDevice)
         {
             HttpResponseMessage message = new HttpResponseMessage();
@@ -130,6 +134,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // DELETE: fhir/Device/5
         [Route("fhir/Device/{deviceId}")]
         [HttpDelete]
+        [RequireHttps]
         public HttpResponseMessage Delete(int deviceId)
         {
             HttpResponseMessage message = new HttpResponseMessage();

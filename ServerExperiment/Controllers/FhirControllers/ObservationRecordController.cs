@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using ServerExperiment.Models;
 using ServerExperiment.Models.POCO;
+using ServerExperiment.Utils;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
@@ -16,6 +17,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // GET: fhir/ObservationRecord
         [Route("fhir/ObservationRecord")]
         [HttpGet]
+        [RequireHttps]
         public IQueryable<ObservationRecord> GetObservationRecords()
         {
             return db.ObservationRecords;
@@ -24,6 +26,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         // GET: fhir/ObservationRecord/5
         [Route("fhir/ObservationRecord/5")]
         [HttpGet]
+        [RequireHttps]
         [ResponseType(typeof(ObservationRecord))]
         public IHttpActionResult GetObservationRecord(int id)
         {
