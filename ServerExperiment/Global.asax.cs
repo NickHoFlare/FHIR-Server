@@ -17,6 +17,7 @@ namespace ServerExperiment
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             GlobalConfiguration.Configuration.Formatters.Add(new XmlFhirFormatter());
+            GlobalConfiguration.Configuration.Formatters.Add(new JsonFhirFormatter());
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);

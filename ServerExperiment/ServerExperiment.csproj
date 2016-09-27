@@ -277,6 +277,7 @@
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\RequireHttpsAttribute.cs" />
+    <Compile Include="Utils\JsonFhirFormatter.cs" />
     <Compile Include="Utils\XmlFhirFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
