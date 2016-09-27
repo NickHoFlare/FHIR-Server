@@ -41,8 +41,8 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Hl7.Fhir.Model.Device fhirDevice = DeviceMapper.MapModel(device);
-            string fixedFormat = ControllerUtils.FixMimeString(_format);
 
+            string fixedFormat = ControllerUtils.FixMimeString(_format);
             string payload = ControllerUtils.Serialize(fhirDevice, fixedFormat, _summary);
 
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
@@ -136,14 +136,12 @@ namespace ServerExperiment.Controllers.FhirControllers
             Device device = db.Devices.Find(deviceId);
             if (device == null)
             {
-                message.StatusCode = HttpStatusCode.NotFound;
-                message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NoContent;
                 return message;
             }
             else if (device.IsDeleted == true)
             {
-                message.StatusCode = HttpStatusCode.Gone;
-                message.Content = new StringContent("Device with id " + deviceId + " has already been deleted!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.OK;
                 return message;
             }
 

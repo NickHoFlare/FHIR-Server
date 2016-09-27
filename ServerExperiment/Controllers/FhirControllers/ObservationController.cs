@@ -136,14 +136,12 @@ namespace ServerExperiment.Controllers.FhirControllers
             Observation observation = db.Observations.Find(observationId);
             if (observation == null)
             {
-                message.StatusCode = HttpStatusCode.NotFound;
-                message.Content = new StringContent("Observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NoContent;
                 return message;
             }
             else if (observation.IsDeleted == true)
             {
-                message.StatusCode = HttpStatusCode.Gone;
-                message.Content = new StringContent("Patient with id " + observationId + " has already been deleted!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.OK;
                 return message;
             }
 

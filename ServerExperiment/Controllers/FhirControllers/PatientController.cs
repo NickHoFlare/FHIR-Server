@@ -137,14 +137,12 @@ namespace ServerExperiment.Controllers
             Patient patient = db.Patients.Find(patientId);
             if (patient == null)
             {
-                message.StatusCode = HttpStatusCode.NotFound;
-                message.Content = new StringContent("Patient with id " + patientId + " not found!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NoContent;
                 return message;
             }
             else if (patient.IsDeleted == true)
             {
-                message.StatusCode = HttpStatusCode.Gone;
-                message.Content = new StringContent("Patient with id " + patientId + " has already been deleted!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.OK;
                 return message;
             }
 
