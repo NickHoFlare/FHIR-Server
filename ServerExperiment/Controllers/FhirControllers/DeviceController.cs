@@ -68,31 +68,33 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Device device = DeviceMapper.MapResource(fhirDevice);
-            repository.UpdateDevice(device);
 
-            DeviceRecord record = repository.GetLatestRecord(deviceId);
-            repository.AddUpdateRecord(device, record);
-
-            try
+            if (DeviceExists(deviceId))
             {
+                DeviceRecord record = repository.GetLatestRecord(deviceId);
+
+                repository.UpdateDevice(device);
+                repository.AddUpdateRecord(device, record);
+
+                repository.Save(); // Look out for DbUpdateConcurrencyException
+
+                message.StatusCode = HttpStatusCode.OK;
+                message.Content = new StringContent("Device with id " + deviceId + " has been modified!", Encoding.UTF8, "text/html");
+            }
+            else
+            {
+                repository.AddDevice(device);
                 repository.Save();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DeviceExists(deviceId))
-                {
-                    message.StatusCode = HttpStatusCode.NotFound;
-                    message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
-                    return message;
-                }
-                else
-                {
-                    throw;
-                }
+
+                DeviceRecord record = new DeviceRecord();
+                repository.AddCreateRecord(device, record);
+                repository.Save();
+
+                message.Content = new StringContent("Device created!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.Created;
+                message.Headers.Location = new Uri(Url.Link("SpecificDevice", new { id = device.DeviceId }));
             }
 
-            message.StatusCode = HttpStatusCode.OK;
-            message.Content = new StringContent("Device with id " + deviceId + " has been modified!", Encoding.UTF8, "text/html");
             return message;
         }
 
@@ -103,6 +105,13 @@ namespace ServerExperiment.Controllers.FhirControllers
         public HttpResponseMessage Create(Hl7.Fhir.Model.Device fhirDevice)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+
+            if (fhirDevice.Id != null || fhirDevice.Id != string.Empty)
+            {
+                message.Content = new StringContent("Device to be added should NOT already have a logical ID!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.BadRequest;
+                return message;
+            }
 
             Device device = DeviceMapper.MapResource(fhirDevice);
             repository.AddDevice(device);

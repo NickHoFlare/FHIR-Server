@@ -68,31 +68,32 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
-            repository.UpdateObservation(observation);
-
-            ObservationRecord record = repository.GetLatestRecord(observationId);
-            repository.AddUpdateRecord(observation, record);
-
-            try
+            if (ObservationExists(observationId))
             {
+                ObservationRecord record = repository.GetLatestRecord(observationId);
+
+                repository.UpdateObservation(observation);
+                repository.AddUpdateRecord(observation, record);
+
+                repository.Save(); // Look out for DbUpdateConcurrencyException
+
+                message.StatusCode = HttpStatusCode.OK;
+                message.Content = new StringContent("Observation with id " + observationId + " has been modified!", Encoding.UTF8, "text/html");
+            }
+            else
+            {
+                repository.AddObservation(observation);
                 repository.Save();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ObservationExists(observationId))
-                {
-                    message.StatusCode = HttpStatusCode.NotFound;
-                    message.Content = new StringContent("observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
-                    return message;
-                }
-                else
-                {
-                    throw;
-                }
+
+                ObservationRecord record = new ObservationRecord();
+                repository.AddCreateRecord(observation, record);
+                repository.Save();
+
+                message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.Created;
+                message.Headers.Location = new Uri(Url.Link("SpecificObservation", new { id = observation.ObservationId }));
             }
 
-            message.StatusCode = HttpStatusCode.OK;
-            message.Content = new StringContent("Patient with id " + observationId + " has been modified!", Encoding.UTF8, "text/html");
             return message;
         }
 
@@ -103,6 +104,13 @@ namespace ServerExperiment.Controllers.FhirControllers
         public HttpResponseMessage Create(Hl7.Fhir.Model.Observation fhirObservation)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+
+            if (fhirObservation.Id != null || fhirObservation.Id != string.Empty)
+            {
+                message.Content = new StringContent("Observation to be added should NOT already have a logical ID!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.BadRequest;
+                return message;
+            }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
             repository.AddObservation(observation);

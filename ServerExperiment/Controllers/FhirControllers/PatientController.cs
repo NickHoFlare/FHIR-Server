@@ -66,31 +66,33 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
-            repository.UpdatePatient(patient);
 
-            PatientRecord record = repository.GetLatestRecord(patientId);
-            repository.AddUpdateRecord(patient, record);
-
-            try
+            if (PatientExists(patientId))
             {
+                PatientRecord record = repository.GetLatestRecord(patientId);
+
+                repository.UpdatePatient(patient);
+                repository.AddUpdateRecord(patient, record);
+
+                repository.Save(); // Look out for DbUpdateConcurrencyException
+
+                message.StatusCode = HttpStatusCode.OK;
+                message.Content = new StringContent("Patient with id " + patientId + " has been modified!", Encoding.UTF8, "text/html");
+            }
+            else
+            {
+                repository.AddPatient(patient);
                 repository.Save();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PatientExists(patientId))
-                {
-                    message.StatusCode = HttpStatusCode.NotFound;
-                    message.Content = new StringContent("Patient with id " + patientId + " not found!", Encoding.UTF8, "text/html");
-                    return message;
-                }
-                else
-                {
-                    throw;
-                }
+
+                PatientRecord record = new PatientRecord();
+                repository.AddCreateRecord(patient, record);
+                repository.Save();
+
+                message.Content = new StringContent("Patient created!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.Created;
+                message.Headers.Location = new Uri(Url.Link("SpecificPatient", new { id = patient.PatientId }));
             }
 
-            message.StatusCode = HttpStatusCode.OK;
-            message.Content = new StringContent("Patient with id " + patientId + " has been modified!", Encoding.UTF8, "text/html");
             return message;
         }
 
@@ -101,6 +103,13 @@ namespace ServerExperiment.Controllers
         public HttpResponseMessage Create(Hl7.Fhir.Model.Patient fhirPatient)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+
+            if (fhirPatient.Id != null || fhirPatient.Id != string.Empty)
+            {
+                message.Content = new StringContent("Patient to be added should NOT already have a logical ID!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.BadRequest;
+                return message;
+            }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
             repository.AddPatient(patient);
