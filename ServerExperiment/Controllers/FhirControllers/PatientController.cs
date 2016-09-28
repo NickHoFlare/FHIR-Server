@@ -14,7 +14,7 @@ namespace ServerExperiment.Controllers
 {
     public class PatientController : ApiController
     {
-        private PatientRepository repository = new PatientRepository();
+        private PatientRepository patientRepository = new PatientRepository();
 
         // GET: fhir/Patient/5
         [Route("fhir/Patient/{patientId}")]
@@ -24,7 +24,7 @@ namespace ServerExperiment.Controllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Patient patient = repository.GetPatientByID(patientId);
+            Patient patient = (Patient)patientRepository.GetResourceByID(patientId);
             if (patient == null)
             {
                 message.StatusCode = HttpStatusCode.NotFound;
@@ -40,7 +40,7 @@ namespace ServerExperiment.Controllers
 
             Hl7.Fhir.Model.Patient fhirPatient = PatientMapper.MapModel(patient);
 
-            PatientRecord record = repository.GetLatestRecord(patientId);
+            PatientRecord record = (PatientRecord)patientRepository.GetLatestRecord(patientId);
 
             string fixedFormat = ControllerUtils.FixMimeString(_format);
             string payload = ControllerUtils.Serialize(fhirPatient, fixedFormat, _summary);
@@ -69,24 +69,24 @@ namespace ServerExperiment.Controllers
 
             if (PatientExists(patientId))
             {
-                PatientRecord record = repository.GetLatestRecord(patientId);
+                PatientRecord record = (PatientRecord)patientRepository.GetLatestRecord(patientId);
 
-                repository.UpdatePatient(patient);
-                repository.AddUpdateRecord(patient, record);
+                patientRepository.UpdateResource(patient);
+                patientRepository.AddUpdateRecord(patient, record);
 
-                repository.Save(); // Look out for DbUpdateConcurrencyException
+                patientRepository.Save(); // Look out for DbUpdateConcurrencyException
 
                 message.StatusCode = HttpStatusCode.OK;
                 message.Content = new StringContent("Patient with id " + patientId + " has been modified!", Encoding.UTF8, "text/html");
             }
             else
             {
-                repository.AddPatient(patient);
-                repository.Save();
+                patientRepository.AddResource(patient);
+                patientRepository.Save();
 
                 PatientRecord record = new PatientRecord();
-                repository.AddCreateRecord(patient, record);
-                repository.Save();
+                patientRepository.AddCreateRecord(patient, record);
+                patientRepository.Save();
 
                 message.Content = new StringContent("Patient created!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
@@ -104,7 +104,7 @@ namespace ServerExperiment.Controllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            if (fhirPatient.Id != null || fhirPatient.Id != string.Empty)
+            if (fhirPatient.Id != null)
             {
                 message.Content = new StringContent("Patient to be added should NOT already have a logical ID!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -112,12 +112,12 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
-            repository.AddPatient(patient);
-            repository.Save();
+            patientRepository.AddResource(patient);
+            patientRepository.Save();
 
             PatientRecord record = new PatientRecord();
-            repository.AddCreateRecord(patient, record);
-            repository.Save();
+            patientRepository.AddCreateRecord(patient, record);
+            patientRepository.Save();
 
             message.Content = new StringContent("Patient created!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -134,7 +134,7 @@ namespace ServerExperiment.Controllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Patient patient = repository.GetPatientByID(patientId);
+            Patient patient = (Patient)patientRepository.GetResourceByID(patientId);
             if (patient == null)
             {
                 message.StatusCode = HttpStatusCode.NoContent;
@@ -146,11 +146,11 @@ namespace ServerExperiment.Controllers
                 return message;
             }
 
-            repository.DeletePatient(patient); // Does not actually delete from DB, simply flips isDeleted flag.
+            patientRepository.DeleteResource(patient); // Does not actually delete from DB, simply flips isDeleted flag.
 
-            PatientRecord record = repository.GetLatestRecord(patientId);
-            repository.AddDeleteRecord(patient, record);
-            repository.Save();
+            PatientRecord record = (PatientRecord)patientRepository.GetLatestRecord(patientId);
+            patientRepository.AddDeleteRecord(patient, record);
+            patientRepository.Save();
 
             message.StatusCode = HttpStatusCode.NoContent;
             return message;
@@ -160,14 +160,14 @@ namespace ServerExperiment.Controllers
         {
             if (disposing)
             {
-                repository.Dispose();
+                patientRepository.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool PatientExists(int id)
         {
-            return repository.PatientExists(id);
+            return patientRepository.ResourceExists(id);
         }
     }
 }

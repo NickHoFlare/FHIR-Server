@@ -8,68 +8,74 @@ using System.Web;
 
 namespace ServerExperiment.Models.Repository
 {
-    public class ObservationRepository : IDisposable
+    public class ObservationRepository : IDisposable, IRepository
     {
         private FhirResourceContext db = new FhirResourceContext();
 
-        public Observation GetObservationByID(int observationId)
+        public IResource GetResourceByID(int observationId)
         {
             return db.Observations.FirstOrDefault(p => p.ObservationId == observationId);
         }
 
-        public void AddObservation(Observation observation)
+        public void AddResource(IResource observation)
         {
             observation.IsDeleted = false;
 
-            db.Observations.Add(observation);
+            db.Observations.Add((Observation)observation);
         }
 
-        public void UpdateObservation(Observation observation)
+        public void UpdateResource(IResource observation)
         {
             db.Entry(observation).State = EntityState.Modified;
         }
 
-        public void DeleteObservation(Observation observation)
+        public void DeleteResource(IResource observation)
         {
             observation.IsDeleted = true;
 
             db.Entry(observation).State = EntityState.Modified;
         }
 
-        public bool ObservationExists(int observationId)
+        public bool ResourceExists(int observationId)
         {
             return db.Observations.Count(e => e.ObservationId == observationId) > 0;
         }
 
-        public ObservationRecord GetLatestRecord(int observationId)
+        public IRecord GetLatestRecord(int observationId)
         {
             return db.ObservationRecords.Where(rec => rec.ObservationId == observationId)
                                     .OrderByDescending(rec => rec.LastModified)
                                     .First();
         }
 
-        public void AddCreateRecord(Observation observation, ObservationRecord record)
+        public void AddCreateRecord(IResource observation, IRecord record)
         {
-            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
-            record.Observation = observation;
+            ObservationRecord observationRecord = (ObservationRecord)record;
 
-            db.ObservationRecords.Add(record);
+            observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            observationRecord.Observation = (Observation)observation;
+
+            db.ObservationRecords.Add(observationRecord);
         }
 
-        public void AddUpdateRecord(Observation observation, ObservationRecord record)
+        public void AddUpdateRecord(IResource observation, IRecord record)
         {
-            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
-            record.Observation = observation;
+            ObservationRecord observationRecord = (ObservationRecord)record;
 
-            db.ObservationRecords.Add(record);
+            observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            observationRecord.Observation = (Observation)observation;
+
+            db.ObservationRecords.Add(observationRecord);
         }
 
-        public void AddDeleteRecord(Observation observation, ObservationRecord record)
+        public void AddDeleteRecord(IResource observation, IRecord record)
         {
-            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
-            record.Observation = observation;
+            ObservationRecord observationRecord = (ObservationRecord)record;
 
-            db.ObservationRecords.Add(record);
+            observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            observationRecord.Observation = (Observation)observation;
+
+            db.ObservationRecords.Add(observationRecord);
         }
 
         public void Save()

@@ -16,7 +16,7 @@ namespace ServerExperiment.Controllers.FhirControllers
 {
     public class ObservationController : ApiController
     {
-        private ObservationRepository repository = new ObservationRepository();
+        private ObservationRepository observationRepository = new ObservationRepository();
 
         // GET: fhir/Observation/5
         [Route("fhir/Observation/{observationId}")]
@@ -26,7 +26,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Observation observation = repository.GetObservationByID(observationId);
+            Observation observation = (Observation)observationRepository.GetResourceByID(observationId);
             if (observation == null)
             {
                 message.StatusCode = HttpStatusCode.NotFound;
@@ -42,7 +42,7 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             Hl7.Fhir.Model.Observation fhirObservation = ObservationMapper.MapModel(observation);
 
-            ObservationRecord record = repository.GetLatestRecord(observationId);
+            ObservationRecord record = (ObservationRecord)observationRepository.GetLatestRecord(observationId);
 
             string fixedFormat = ControllerUtils.FixMimeString(_format);
             string payload = ControllerUtils.Serialize(fhirObservation, fixedFormat, _summary);
@@ -70,24 +70,24 @@ namespace ServerExperiment.Controllers.FhirControllers
             Observation observation = ObservationMapper.MapResource(fhirObservation);
             if (ObservationExists(observationId))
             {
-                ObservationRecord record = repository.GetLatestRecord(observationId);
+                ObservationRecord record = (ObservationRecord)observationRepository.GetLatestRecord(observationId);
 
-                repository.UpdateObservation(observation);
-                repository.AddUpdateRecord(observation, record);
+                observationRepository.UpdateResource(observation);
+                observationRepository.AddUpdateRecord(observation, record);
 
-                repository.Save(); // Look out for DbUpdateConcurrencyException
+                observationRepository.Save(); // Look out for DbUpdateConcurrencyException
 
                 message.StatusCode = HttpStatusCode.OK;
                 message.Content = new StringContent("Observation with id " + observationId + " has been modified!", Encoding.UTF8, "text/html");
             }
             else
             {
-                repository.AddObservation(observation);
-                repository.Save();
+                observationRepository.AddResource(observation);
+                observationRepository.Save();
 
                 ObservationRecord record = new ObservationRecord();
-                repository.AddCreateRecord(observation, record);
-                repository.Save();
+                observationRepository.AddCreateRecord(observation, record);
+                observationRepository.Save();
 
                 message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
@@ -105,7 +105,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            if (fhirObservation.Id != null || fhirObservation.Id != string.Empty)
+            if (fhirObservation.Id != null)
             {
                 message.Content = new StringContent("Observation to be added should NOT already have a logical ID!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -113,12 +113,12 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
-            repository.AddObservation(observation);
-            repository.Save();
+            observationRepository.AddResource(observation);
+            observationRepository.Save();
 
             ObservationRecord record = new ObservationRecord();
-            repository.AddCreateRecord(observation, record);
-            repository.Save();
+            observationRepository.AddCreateRecord(observation, record);
+            observationRepository.Save();
 
             message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -135,7 +135,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Observation observation = repository.GetObservationByID(observationId);
+            Observation observation = (Observation)observationRepository.GetResourceByID(observationId);
             if (observation == null)
             {
                 message.StatusCode = HttpStatusCode.NoContent;
@@ -147,11 +147,11 @@ namespace ServerExperiment.Controllers.FhirControllers
                 return message;
             }
 
-            repository.DeleteObservation(observation); // Does not actually delete from DB, simply flips isDeleted flag.
+            observationRepository.DeleteResource(observation); // Does not actually delete from DB, simply flips isDeleted flag.
 
-            ObservationRecord record = repository.GetLatestRecord(observationId);
-            repository.AddDeleteRecord(observation, record);
-            repository.Save();
+            ObservationRecord record = (ObservationRecord)observationRepository.GetLatestRecord(observationId);
+            observationRepository.AddDeleteRecord(observation, record);
+            observationRepository.Save();
 
             message.StatusCode = HttpStatusCode.NoContent;
             return message;
@@ -161,14 +161,14 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             if (disposing)
             {
-                repository.Dispose();
+                observationRepository.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool ObservationExists(int id)
         {
-            return repository.ObservationExists(id);
+            return observationRepository.ResourceExists(id);
         }
     }
 }

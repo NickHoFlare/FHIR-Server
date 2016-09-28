@@ -6,68 +6,74 @@ using System.Linq;
 
 namespace ServerExperiment.Models.Repository
 {
-    public class PatientRepository : IDisposable
+    public class PatientRepository : IDisposable, IRepository
     {
         private FhirResourceContext db = new FhirResourceContext();
 
-        public Patient GetPatientByID(int patientId)
+        public IResource GetResourceByID(int patientId)
         {
             return db.Patients.FirstOrDefault(p => p.PatientId == patientId);
         }
 
-        public void AddPatient(Patient patient)
+        public void AddResource(IResource patient)
         {
             patient.IsDeleted = false;
 
-            db.Patients.Add(patient);
+            db.Patients.Add((Patient)patient);
         }
 
-        public void UpdatePatient(Patient patient)
+        public void UpdateResource(IResource patient)
         {
             db.Entry(patient).State = EntityState.Modified;
         }
 
-        public void DeletePatient(Patient patient)
+        public void DeleteResource(IResource patient)
         {
             patient.IsDeleted = true;
 
             db.Entry(patient).State = EntityState.Modified;
         }
 
-        public bool PatientExists(int patientId)
+        public bool ResourceExists(int patientId)
         {
             return db.Patients.Count(e => e.PatientId == patientId) > 0;
         }
 
-        public PatientRecord GetLatestRecord(int patientId)
+        public IRecord GetLatestRecord(int patientId)
         {
             return db.PatientRecords.Where(rec => rec.PatientId == patientId)
                                     .OrderByDescending(rec => rec.LastModified)
                                     .First();
         }
 
-        public void AddCreateRecord(Patient patient, PatientRecord record)
+        public void AddCreateRecord(IResource patient, IRecord record)
         {
-            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
-            record.Patient = patient;
+            PatientRecord patientRecord = (PatientRecord)record;
 
-            db.PatientRecords.Add(record);
+            patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            patientRecord.Patient = (Patient)patient;
+
+            db.PatientRecords.Add(patientRecord);
         }
 
-        public void AddUpdateRecord(Patient patient, PatientRecord record)
+        public void AddUpdateRecord(IResource patient, IRecord record)
         {
-            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
-            record.Patient = patient;
+            PatientRecord patientRecord = (PatientRecord)record;
 
-            db.PatientRecords.Add(record);
+            patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            patientRecord.Patient = (Patient)patient;
+
+            db.PatientRecords.Add(patientRecord);
         }
 
-        public void AddDeleteRecord(Patient patient, PatientRecord record)
+        public void AddDeleteRecord(IResource patient, IRecord record)
         {
-            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
-            record.Patient = patient;
+            PatientRecord patientRecord = (PatientRecord)record;
 
-            db.PatientRecords.Add(record);
+            patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            patientRecord.Patient = (Patient)patient;
+
+            db.PatientRecords.Add(patientRecord);
         }
 
         public void Save()
