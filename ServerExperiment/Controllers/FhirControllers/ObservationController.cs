@@ -10,12 +10,13 @@ using ServerExperiment.Models.FHIR.Mappers;
 using ServerExperiment.Models.POCO;
 using ServerExperiment.Models;
 using ServerExperiment.Utils;
+using ServerExperiment.Models.Repository;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
     public class ObservationController : ApiController
     {
-        private FhirResourceContext db = new FhirResourceContext();
+        private ObservationRepository repository = new ObservationRepository();
 
         // GET: fhir/Observation/5
         [Route("fhir/Observation/{observationId}")]
@@ -25,7 +26,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Observation observation = db.Observations.Find(observationId);
+            Observation observation = repository.GetObservationByID(observationId);
             if (observation == null)
             {
                 message.StatusCode = HttpStatusCode.NotFound;
@@ -41,12 +42,12 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             Hl7.Fhir.Model.Observation fhirObservation = ObservationMapper.MapModel(observation);
 
-            ObservationRecord record = db.ObservationRecords.Where(rec => rec.ObservationId == observationId).OrderByDescending(rec => rec.LastModified).First();
-            message.Content.Headers.LastModified = record.LastModified;
+            ObservationRecord record = repository.GetLatestRecord(observationId);
 
             string fixedFormat = ControllerUtils.FixMimeString(_format);
             string payload = ControllerUtils.Serialize(fhirObservation, fixedFormat, _summary);
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
+            message.Content.Headers.LastModified = record.LastModified;
 
             return message;
         }
@@ -67,19 +68,14 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
+            repository.UpdateObservation(observation);
 
-            db.Entry(observation).State = EntityState.Modified;
-            //db.SaveChanges();
-
-            ObservationRecord record = db.ObservationRecords.Where(rec => rec.ObservationId == observationId).OrderByDescending(rec => rec.LastModified).First();
-            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
-            record.Observation = observation;
-
-            db.ObservationRecords.Add(record);
+            ObservationRecord record = repository.GetLatestRecord(observationId);
+            repository.AddUpdateRecord(observation, record);
 
             try
             {
-                db.SaveChanges();
+                repository.Save();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -109,17 +105,12 @@ namespace ServerExperiment.Controllers.FhirControllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
-            observation.IsDeleted = false;
-
-            db.Observations.Add(observation);
-            db.SaveChanges();
+            repository.AddObservation(observation);
+            repository.Save();
 
             ObservationRecord record = new ObservationRecord();
-            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
-            record.Observation = observation;
-
-            db.ObservationRecords.Add(record);
-            db.SaveChanges();
+            repository.AddCreateRecord(observation, record);
+            repository.Save();
 
             message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -136,7 +127,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Observation observation = db.Observations.Find(observationId);
+            Observation observation = repository.GetObservationByID(observationId);
             if (observation == null)
             {
                 message.StatusCode = HttpStatusCode.NoContent;
@@ -148,16 +139,11 @@ namespace ServerExperiment.Controllers.FhirControllers
                 return message;
             }
 
-            observation.IsDeleted = true;
+            repository.DeleteObservation(observation); // Does not actually delete from DB, simply flips isDeleted flag.
 
-            db.Entry(observation).State = EntityState.Modified;
-
-            ObservationRecord record = db.ObservationRecords.Where(rec => rec.ObservationId == observationId).OrderByDescending(rec => rec.LastModified).First();
-            record = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
-            record.Observation = observation;
-
-            db.ObservationRecords.Add(record);
-            db.SaveChanges();
+            ObservationRecord record = repository.GetLatestRecord(observationId);
+            repository.AddDeleteRecord(observation, record);
+            repository.Save();
 
             message.StatusCode = HttpStatusCode.NoContent;
             return message;
@@ -167,14 +153,14 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repository.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool ObservationExists(int id)
         {
-            return db.Observations.Count(e => e.ObservationId == id) > 0;
+            return repository.ObservationExists(id);
         }
     }
 }

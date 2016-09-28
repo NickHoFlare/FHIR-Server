@@ -10,13 +10,13 @@ using ServerExperiment.Models.FHIR.Mappers;
 using ServerExperiment.Models.POCO;
 using ServerExperiment.Models;
 using ServerExperiment.Utils;
+using ServerExperiment.Models.Repository;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
     public class DeviceController : ApiController
     {
-        private FhirResourceContext db = new FhirResourceContext();
-
+        private DeviceRepository repository = new DeviceRepository();
 
         // GET: fhir/Device/5
         [Route("fhir/Device/{deviceId}")]
@@ -26,7 +26,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Device device = db.Devices.Find(deviceId);
+            Device device = repository.GetDeviceByID(deviceId);
             if (device == null)
             {
                 message.StatusCode = HttpStatusCode.NotFound;
@@ -42,12 +42,12 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             Hl7.Fhir.Model.Device fhirDevice = DeviceMapper.MapModel(device);
 
-            DeviceRecord record = db.DeviceRecords.Where(rec => rec.DeviceId == deviceId).OrderByDescending(rec => rec.LastModified).First();
-            message.Content.Headers.LastModified = record.LastModified;
+            DeviceRecord record = repository.GetLatestRecord(deviceId);
 
             string fixedFormat = ControllerUtils.FixMimeString(_format);
             string payload = ControllerUtils.Serialize(fhirDevice, fixedFormat, _summary);
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
+            message.Content.Headers.LastModified = record.LastModified;
 
             return message;
         }
@@ -68,18 +68,14 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Device device = DeviceMapper.MapResource(fhirDevice);
+            repository.UpdateDevice(device);
 
-            db.Entry(device).State = EntityState.Modified;
-
-            DeviceRecord record = db.DeviceRecords.Where(rec => rec.DeviceId == deviceId).OrderByDescending(rec => rec.LastModified).First();
-            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
-            record.Device = device;
-
-            db.DeviceRecords.Add(record);
+            DeviceRecord record = repository.GetLatestRecord(deviceId);
+            repository.AddUpdateRecord(device, record);
 
             try
             {
-                db.SaveChanges();
+                repository.Save();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -109,17 +105,12 @@ namespace ServerExperiment.Controllers.FhirControllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Device device = DeviceMapper.MapResource(fhirDevice);
-            device.IsDeleted = false;
-
-            db.Devices.Add(device);
-            db.SaveChanges();
+            repository.AddDevice(device);
+            repository.Save();
 
             DeviceRecord record = new DeviceRecord();
-            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
-            record.Device = device;
-
-            db.DeviceRecords.Add(record);
-            db.SaveChanges();
+            repository.AddCreateRecord(device, record);
+            repository.Save();
 
             message.Content = new StringContent("Device created!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -136,7 +127,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Device device = db.Devices.Find(deviceId);
+            Device device = repository.GetDeviceByID(deviceId);
             if (device == null)
             {
                 message.StatusCode = HttpStatusCode.NoContent;
@@ -148,16 +139,11 @@ namespace ServerExperiment.Controllers.FhirControllers
                 return message;
             }
 
-            device.IsDeleted = true;
+            repository.DeleteDevice(device);
 
-            db.Entry(device).State = EntityState.Modified;
-
-            DeviceRecord record = db.DeviceRecords.Where(rec => rec.DeviceId == deviceId).OrderByDescending(rec => rec.LastModified).First();
-            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
-            record.Device = device;
-
-            db.DeviceRecords.Add(record);
-            db.SaveChanges();
+            DeviceRecord record = repository.GetLatestRecord(deviceId);
+            repository.AddDeleteRecord(device, record);
+            repository.Save();
 
             message.StatusCode = HttpStatusCode.NoContent;
             return message;
@@ -167,14 +153,14 @@ namespace ServerExperiment.Controllers.FhirControllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repository.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool DeviceExists(int id)
         {
-            return db.Devices.Count(e => e.DeviceId == id) > 0;
+            return repository.DeviceExists(id);
         }
     }
 }

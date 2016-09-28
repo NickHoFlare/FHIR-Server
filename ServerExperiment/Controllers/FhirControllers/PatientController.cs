@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -9,15 +7,15 @@ using System.Text;
 using ServerExperiment.Controllers.FhirControllers;
 using ServerExperiment.Models.POCO;
 using ServerExperiment.POCO.FHIR.Mappers;
-using ServerExperiment.Models;
 using ServerExperiment.Utils;
+using ServerExperiment.Models.Repository;
 
 namespace ServerExperiment.Controllers
 {
     public class PatientController : ApiController
     {
-        private FhirResourceContext db = new FhirResourceContext();
-        
+        private PatientRepository repository = new PatientRepository();
+
         // GET: fhir/Patient/5
         [Route("fhir/Patient/{patientId}")]
         [HttpGet]
@@ -26,7 +24,7 @@ namespace ServerExperiment.Controllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Patient patient = db.Patients.Find(patientId);
+            Patient patient = repository.GetPatientByID(patientId);
             if (patient == null)
             {
                 message.StatusCode = HttpStatusCode.NotFound;
@@ -42,12 +40,12 @@ namespace ServerExperiment.Controllers
 
             Hl7.Fhir.Model.Patient fhirPatient = PatientMapper.MapModel(patient);
 
-            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
-            message.Content.Headers.LastModified = record.LastModified;
+            PatientRecord record = repository.GetLatestRecord(patientId);
 
             string fixedFormat = ControllerUtils.FixMimeString(_format);
             string payload = ControllerUtils.Serialize(fhirPatient, fixedFormat, _summary);
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
+            message.Content.Headers.LastModified = record.LastModified;
 
             return message;
         }
@@ -68,19 +66,14 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
+            repository.UpdatePatient(patient);
 
-            db.Entry(patient).State = EntityState.Modified;
-            //db.SaveChanges();
-
-            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
-            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
-            record.Patient = patient;
-
-            db.PatientRecords.Add(record);
+            PatientRecord record = repository.GetLatestRecord(patientId);
+            repository.AddUpdateRecord(patient, record);
 
             try
             {
-                db.SaveChanges();
+                repository.Save();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -110,17 +103,12 @@ namespace ServerExperiment.Controllers
             HttpResponseMessage message = new HttpResponseMessage();
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
-            patient.IsDeleted = false;
-
-            db.Patients.Add(patient);
-            db.SaveChanges();
+            repository.AddPatient(patient);
+            repository.Save();
 
             PatientRecord record = new PatientRecord();
-            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
-            record.Patient = patient;
-
-            db.PatientRecords.Add(record);
-            db.SaveChanges();
+            repository.AddCreateRecord(patient, record);
+            repository.Save();
 
             message.Content = new StringContent("Patient created!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -137,7 +125,7 @@ namespace ServerExperiment.Controllers
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
-            Patient patient = db.Patients.Find(patientId);
+            Patient patient = repository.GetPatientByID(patientId);
             if (patient == null)
             {
                 message.StatusCode = HttpStatusCode.NoContent;
@@ -149,16 +137,11 @@ namespace ServerExperiment.Controllers
                 return message;
             }
 
-            patient.IsDeleted = true;
+            repository.DeletePatient(patient); // Does not actually delete from DB, simply flips isDeleted flag.
 
-            db.Entry(patient).State = EntityState.Modified;
-
-            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
-            record = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
-            record.Patient = patient;
-
-            db.PatientRecords.Add(record);
-            db.SaveChanges();
+            PatientRecord record = repository.GetLatestRecord(patientId);
+            repository.AddDeleteRecord(patient, record);
+            repository.Save();
 
             message.StatusCode = HttpStatusCode.NoContent;
             return message;
@@ -168,14 +151,14 @@ namespace ServerExperiment.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repository.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool PatientExists(int id)
         {
-            return db.Patients.Count(e => e.PatientId == id) > 0;
+            return repository.PatientExists(id);
         }
     }
 }
