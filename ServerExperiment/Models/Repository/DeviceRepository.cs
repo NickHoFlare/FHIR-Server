@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ServerExperiment.Models.Repository
 {
-    public class DeviceRepository : IDisposable
+    public class DeviceRepository : IDisposable, IRepository
     {
         private FhirResourceContext db = new FhirResourceContext();
 
@@ -15,19 +15,19 @@ namespace ServerExperiment.Models.Repository
             return db.Devices.FirstOrDefault(p => p.DeviceId == deviceId);
         }
 
-        public void AddResource(Device device)
+        public void AddResource(IResource device)
         {
             device.IsDeleted = false;
 
-            db.Devices.Add(device);
+            db.Devices.Add((Device)device);
         }
 
-        public void UpdateResource(Device device)
+        public void UpdateResource(IResource device)
         {
             db.Entry(device).State = EntityState.Modified;
         }
 
-        public void DeleteResource(Device device)
+        public void DeleteResource(IResource device)
         {
             device.IsDeleted = true;
 
@@ -46,28 +46,34 @@ namespace ServerExperiment.Models.Repository
                                     .First();
         }
 
-        public void AddCreateRecord(Device device, DeviceRecord record)
+        public void AddCreateRecord(IResource device, IRecord record)
         {
-            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
-            record.Device = device;
+            DeviceRecord deviceRecord = (DeviceRecord)record;
 
-            db.DeviceRecords.Add(record);
+            deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            deviceRecord.Device = (Device)device;
+
+            db.DeviceRecords.Add(deviceRecord);
         }
 
-        public void AddUpdateRecord(Device device, DeviceRecord record)
+        public void AddUpdateRecord(IResource device, IRecord record)
         {
-            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
-            record.Device = device;
+            DeviceRecord deviceRecord = (DeviceRecord)record;
 
-            db.DeviceRecords.Add(record);
+            deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            deviceRecord.Device = (Device)device;
+
+            db.DeviceRecords.Add(deviceRecord);
         }
 
-        public void AddDeleteRecord(Device device, DeviceRecord record)
+        public void AddDeleteRecord(IResource device, IRecord record)
         {
-            record = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
-            record.Device = device;
+            DeviceRecord deviceRecord = (DeviceRecord)record;
 
-            db.DeviceRecords.Add(record);
+            deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            deviceRecord.Device = (Device)device;
+
+            db.DeviceRecords.Add(deviceRecord);
         }
 
         public void Save()
