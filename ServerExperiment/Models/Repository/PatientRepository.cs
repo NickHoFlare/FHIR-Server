@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ServerExperiment.Models.Repository
 {
-    public class PatientRepository : IDisposable, IRepository
+    public class PatientRepository : IDisposable, IPatientRepository
     {
         private FhirResourceContext db = new FhirResourceContext();
 

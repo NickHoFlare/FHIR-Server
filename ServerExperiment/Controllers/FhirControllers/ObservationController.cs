@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
 using ServerExperiment.Models.POCO;
-using ServerExperiment.Models;
 using ServerExperiment.Utils;
 using ServerExperiment.Models.Repository;
 
@@ -16,7 +12,14 @@ namespace ServerExperiment.Controllers.FhirControllers
 {
     public class ObservationController : ApiController
     {
-        private ObservationRepository observationRepository = new ObservationRepository();
+        //private ObservationRepository observationRepository = new ObservationRepository();
+
+        private IObservationRepository observationRepository;
+
+        public ObservationController(IObservationRepository repository)
+        {
+            this.observationRepository = repository;
+        }
 
         // GET: fhir/Observation/5
         [Route("fhir/Observation/{observationId}")]

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Entity.Infrastructure;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -14,7 +13,14 @@ namespace ServerExperiment.Controllers
 {
     public class PatientController : ApiController
     {
-        private PatientRepository patientRepository = new PatientRepository();
+        //private PatientRepository patientRepository = new PatientRepository();
+
+        private IPatientRepository patientRepository;
+
+        public PatientController(IPatientRepository repository)
+        {
+            this.patientRepository = repository;
+        }
 
         // GET: fhir/Patient/5
         [Route("fhir/Patient/{patientId}")]

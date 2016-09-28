@@ -22,9 +22,9 @@ namespace ServerExperiment
 
             // Configuration of Unity Dependency Resolver
             var container = new UnityContainer();
-            container.RegisterType<IRepository, PatientRepository>(new HierarchicalLifetimeManager());
-            container.RegisterType<IRepository, DeviceRepository>(new HierarchicalLifetimeManager());
-            container.RegisterType<IRepository, ObservationRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IPatientRepository, PatientRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IDeviceRepository, DeviceRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IObservationRepository, ObservationRepository>(new HierarchicalLifetimeManager());
             config.DependencyResolver = new UnityResolver(container);
 
             // Web API routes

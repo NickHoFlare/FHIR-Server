@@ -8,7 +8,7 @@ using System.Web;
 
 namespace ServerExperiment.Models.Repository
 {
-    public class ObservationRepository : IDisposable, IRepository
+    public class ObservationRepository : IDisposable, IObservationRepository
     {
         private FhirResourceContext db = new FhirResourceContext();
 

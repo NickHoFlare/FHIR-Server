@@ -1,0 +1,19 @@
+﻿using ServerExperiment.Models.POCO;
+
+namespace ServerExperiment.Models.Repository
+{
+    public interface IObservationRepository
+    {
+        IResource GetResourceByID(int resourceId);
+        void AddResource(IResource resource);
+        void UpdateResource(IResource resource);
+        void DeleteResource(IResource resource);
+        bool ResourceExists(int resourceId);
+        IRecord GetLatestRecord(int resourceId);
+        void AddCreateRecord(IResource resource, IRecord record);
+        void AddUpdateRecord(IResource resource, IRecord record);
+        void AddDeleteRecord(IResource resource, IRecord record);
+        void Save();
+        void Dispose();
+    }
+}

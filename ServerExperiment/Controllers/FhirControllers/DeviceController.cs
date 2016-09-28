@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
 using ServerExperiment.Models.POCO;
-using ServerExperiment.Models;
 using ServerExperiment.Utils;
 using ServerExperiment.Models.Repository;
 
@@ -16,7 +12,14 @@ namespace ServerExperiment.Controllers.FhirControllers
 {
     public class DeviceController : ApiController
     {
-        private DeviceRepository deviceRepository = new DeviceRepository();
+        //private DeviceRepository deviceRepository = new DeviceRepository();
+
+        private IDeviceRepository deviceRepository;
+
+        public DeviceController(IDeviceRepository repository)
+        {
+            this.deviceRepository = repository;
+        }
 
         // GET: fhir/Device/5
         [Route("fhir/Device/{deviceId}")]

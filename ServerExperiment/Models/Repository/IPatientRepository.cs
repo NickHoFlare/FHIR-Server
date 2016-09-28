@@ -2,7 +2,7 @@
 
 namespace ServerExperiment.Models.Repository
 {
-    public interface IRepository
+    public interface IPatientRepository
     {
         IResource GetResourceByID(int resourceId);
         void AddResource(IResource resource);
@@ -14,5 +14,6 @@ namespace ServerExperiment.Models.Repository
         void AddUpdateRecord(IResource resource, IRecord record);
         void AddDeleteRecord(IResource resource, IRecord record);
         void Save();
+        void Dispose();
     }
 }
