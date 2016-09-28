@@ -111,7 +111,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             foreach (var address in source.Address)
             {
                 string addLine1 = address.LineElement[0].Value;
-                string addLine2 = null;
+                string addLine2 = string.Empty;
                 if (address.LineElement.Count > 1)
                     addLine2 = address.LineElement[1].Value;
                 string postalCode = address.PostalCode;
@@ -119,8 +119,8 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                 string country = address.Country;
                 string state = address.State;
                 var period = address.Period;
-                string periodStart = null;
-                string periodEnd = null;
+                string periodStart = string.Empty;
+                string periodEnd = string.Empty;
                 if (period != null)
                 {
                     periodStart = address.Period.Start;
@@ -232,6 +232,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             ContactPoint phone = null;
             ContactPoint mobile = null;
             ContactPoint email = null;
+            List<ContactPoint> contactPoints= new List<ContactPoint>();
 
             if (patient.Phone != null)
             {
@@ -241,6 +242,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                     System = ContactPoint.ContactPointSystem.Phone,
                     Use = ContactPoint.ContactPointUse.Home
                 };
+                contactPoints.Add(phone);
             }
             if (patient.Mobile != null)
             {
@@ -250,6 +252,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                     System = ContactPoint.ContactPointSystem.Phone,
                     Use = ContactPoint.ContactPointUse.Mobile
                 };
+                contactPoints.Add(mobile);
             }
             if (patient.Email != null)
             {
@@ -259,40 +262,43 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                     System = ContactPoint.ContactPointSystem.Email,
                     Use = ContactPoint.ContactPointUse.Home
                 };
+                contactPoints.Add(email);
             }
 
             if (patient.Phone != null || patient.Mobile != null || patient.Email != null)
             {
-                resource.Telecom = new List<ContactPoint>{
-                    phone,mobile,email
-                };
+                resource.Telecom = contactPoints;
             }
 
             // Patient Address
-            resource.Address = new List<Address>();
-            List<Address> fhirAddresses = new List<Address>();
+            List<Address> fhirAddresses = null;
 
-            for (int j = 0; j < patient.Countries.Count; j++)
+            if (patient.AddressLines1 != null && patient.AddressLines1[0] != string.Empty)
             {
-                Address fhirAddress = new Address()
+                fhirAddresses = new List<Address>();
+
+                for (int j = 0; j < patient.AddressLines1.Count; j++)
                 {
-                    Country = patient.Countries[j],
-                    City = patient.Cities[j],
-                    State = patient.States[j],
-                    PostalCode = patient.PostalCodes[j],
-                    Line = new[]
+                    Address fhirAddress = new Address()
                     {
+                        Country = patient.Countries[j],
+                        City = patient.Cities[j],
+                        State = patient.States[j],
+                        PostalCode = patient.PostalCodes[j],
+                        Line = new[]
+                        {
                         patient.AddressLines1[j],
                         patient.AddressLines2[j],
                     },
-                    Period = new Period
-                    {
-                        Start = patient.PeriodStarts[j],
-                        End = patient.PeriodEnds[j],
-                    }
-                };
+                        Period = new Period
+                        {
+                            Start = patient.PeriodStarts[j],
+                            End = patient.PeriodEnds[j],
+                        }
+                    };
 
-                fhirAddresses.Add(fhirAddress);
+                    fhirAddresses.Add(fhirAddress);
+                }
             }
 
             resource.Address = fhirAddresses;

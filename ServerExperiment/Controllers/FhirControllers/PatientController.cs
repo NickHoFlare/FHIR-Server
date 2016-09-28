@@ -41,11 +41,14 @@ namespace ServerExperiment.Controllers
             }
 
             Hl7.Fhir.Model.Patient fhirPatient = PatientMapper.MapModel(patient);
+
+            PatientRecord record = db.PatientRecords.Where(rec => rec.PatientId == patientId).OrderByDescending(rec => rec.LastModified).First();
+            message.Content.Headers.LastModified = record.LastModified;
+
             string fixedFormat = ControllerUtils.FixMimeString(_format);
-
             string payload = ControllerUtils.Serialize(fhirPatient, fixedFormat, _summary);
-
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
+
             return message;
         }
 
