@@ -42,10 +42,13 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             Hl7.Fhir.Model.Device fhirDevice = DeviceMapper.MapModel(device);
 
+            DeviceRecord record = db.DeviceRecords.Where(rec => rec.DeviceId == deviceId).OrderByDescending(rec => rec.LastModified).First();
+            message.Content.Headers.LastModified = record.LastModified;
+
             string fixedFormat = ControllerUtils.FixMimeString(_format);
             string payload = ControllerUtils.Serialize(fhirDevice, fixedFormat, _summary);
-
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
+
             return message;
         }
 

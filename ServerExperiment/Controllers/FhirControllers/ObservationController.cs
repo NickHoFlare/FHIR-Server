@@ -40,11 +40,14 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Hl7.Fhir.Model.Observation fhirObservation = ObservationMapper.MapModel(observation);
+
+            ObservationRecord record = db.ObservationRecords.Where(rec => rec.ObservationId == observationId).OrderByDescending(rec => rec.LastModified).First();
+            message.Content.Headers.LastModified = record.LastModified;
+
             string fixedFormat = ControllerUtils.FixMimeString(_format);
-
             string payload = ControllerUtils.Serialize(fhirObservation, fixedFormat, _summary);
-
             message.Content = new StringContent(payload, Encoding.UTF8, fixedFormat);
+
             return message;
         }
 
