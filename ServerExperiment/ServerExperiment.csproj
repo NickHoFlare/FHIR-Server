@@ -265,6 +265,7 @@
     <Compile Include="Models\FHIR\Mappers\DeviceMapper.cs" />
     <Compile Include="Models\FHIR\Mappers\PatientMapper.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\POCO\IResource.cs" />
     <Compile Include="Models\POCO\ObservationRecord.cs" />
     <Compile Include="Models\POCO\IRecord.cs" />
     <Compile Include="Models\POCO\Observation.cs" />
@@ -272,6 +273,7 @@
     <Compile Include="Models\POCO\Patient.cs" />
     <Compile Include="Models\POCO\DeviceRecord.cs" />
     <Compile Include="Models\POCO\PatientRecord.cs" />
+    <Compile Include="Models\Repository\IRepository.cs" />
     <Compile Include="Models\Repository\ObservationRepository.cs" />
     <Compile Include="Models\Repository\DeviceRepository.cs" />
     <Compile Include="Models\Repository\PatientRepository.cs" />

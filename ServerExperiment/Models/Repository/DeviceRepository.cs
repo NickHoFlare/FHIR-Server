@@ -10,36 +10,36 @@ namespace ServerExperiment.Models.Repository
     {
         private FhirResourceContext db = new FhirResourceContext();
 
-        public Device GetDeviceByID(int deviceId)
+        public IResource GetResourceByID(int deviceId)
         {
             return db.Devices.FirstOrDefault(p => p.DeviceId == deviceId);
         }
 
-        public void AddDevice(Device device)
+        public void AddResource(Device device)
         {
             device.IsDeleted = false;
 
             db.Devices.Add(device);
         }
 
-        public void UpdateDevice(Device device)
+        public void UpdateResource(Device device)
         {
             db.Entry(device).State = EntityState.Modified;
         }
 
-        public void DeleteDevice(Device device)
+        public void DeleteResource(Device device)
         {
             device.IsDeleted = true;
 
             db.Entry(device).State = EntityState.Modified;
         }
 
-        public bool DeviceExists(int deviceId)
+        public bool ResourceExists(int deviceId)
         {
             return db.Devices.Count(e => e.DeviceId == deviceId) > 0;
         }
 
-        public DeviceRecord GetLatestRecord(int deviceId)
+        public IRecord GetLatestRecord(int deviceId)
         {
             return db.DeviceRecords.Where(rec => rec.DeviceId == deviceId)
                                     .OrderByDescending(rec => rec.LastModified)

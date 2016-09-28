@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ServerExperiment.Models.POCO
 {
-    public class Patient
+    public class Patient : IResource
 	{
         public Patient()
         {
