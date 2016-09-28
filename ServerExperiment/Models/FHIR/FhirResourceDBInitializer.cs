@@ -1,4 +1,5 @@
-﻿using ServerExperiment.Models.FHIR;
+﻿using ServerExperiment.Controllers.FhirControllers;
+using ServerExperiment.Models.FHIR;
 using ServerExperiment.Models.FHIR.Helpers.Device;
 using ServerExperiment.Models.FHIR.Helpers.Observation;
 using ServerExperiment.Models.FHIR.Helpers.Patient;
@@ -26,8 +27,9 @@ namespace ServerExperiment.Models
             string addLine1 = "123 Happy Road;456 Rainbow Road";
             string AddLine2 = "Black Building;Blue Building";
 
-            defaultPatients.Add(new Patient());
-            defaultPatients.Add(new Patient() {
+            Patient patient1 = new Patient();
+            Patient patient2 = new Patient()
+            {
                 Nationality = "Blablabla",
                 IsDeleted = false,
                 FirstNamesSerialised = firstNames,
@@ -44,8 +46,9 @@ namespace ServerExperiment.Models
                 PeriodEndsSerialised = ";",
                 Active = true,
                 Deceased = false
-            });
-            defaultPatients.Add(new Patient() {
+            };
+            Patient patient3 = new Patient()
+            {
                 Nationality = "Australian",
                 IsDeleted = false,
                 FirstNamesSerialised = firstNames,
@@ -56,16 +59,49 @@ namespace ServerExperiment.Models
                 Gender = GenderCode.Male,
                 Active = true,
                 Deceased = false
-            });
+            };
+
+            defaultPatients.Add(patient1);
+            defaultPatients.Add(patient2);
+            defaultPatients.Add(patient3);
 
             foreach (Patient patient in defaultPatients)
                 context.Patients.Add(patient);
 
+            IList<PatientRecord> defaultPatientRecords = new List<PatientRecord>();
+            defaultPatientRecords.Add(new PatientRecord()
+            {
+                PatientId = 1,
+                Patient = patient1,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+            defaultPatientRecords.Add(new PatientRecord()
+            {
+                PatientId = 2,
+                Patient = patient2,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+            defaultPatientRecords.Add(new PatientRecord()
+            {
+                PatientId = 3,
+                Patient = patient3,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+
+            foreach (PatientRecord record in defaultPatientRecords)
+                context.PatientRecords.Add(record);
+
             // Seed Device data
             IList<Device> defaultDevices = new List<Device>();
 
-            defaultDevices.Add(new Device());
-            defaultDevices.Add(new Device()
+            Device device1 = new Device();
+            Device device2 = new Device()
             {
                 TypeSystem = "http://snomed.info/sct",
                 TypeCode = "86184003",
@@ -74,23 +110,56 @@ namespace ServerExperiment.Models
                 Manufacturer = "ACME",
                 Model = "D3AD-B33F",
                 PatientReference = "Patient/2"
-            });
-            defaultDevices.Add(new Device()
+            };
+            Device device3 = new Device()
             {
                 TypeText = "Spirometer",
                 Status = DevStatus.available,
                 Manufacturer = "ACME",
                 Model = "D3AD-B33F",
-            });
+            };
+
+            defaultDevices.Add(device1);
+            defaultDevices.Add(device2);
+            defaultDevices.Add(device3);
 
             foreach (Device device in defaultDevices)
                 context.Devices.Add(device);
-            
+
+            IList<DeviceRecord> defaultDeviceRecords = new List<DeviceRecord>();
+            defaultDeviceRecords.Add(new DeviceRecord()
+            {
+                DeviceId = 1,
+                Device = device1,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+            defaultDeviceRecords.Add(new DeviceRecord()
+            {
+                DeviceId = 2,
+                Device = device2,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+            defaultDeviceRecords.Add(new DeviceRecord()
+            {
+                DeviceId = 3,
+                Device = device3,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+
+            foreach (DeviceRecord record in defaultDeviceRecords)
+                context.DeviceRecords.Add(record);
+
             // Seed Observation data
             IList<Observation> defaultObservation = new List<Observation>();
 
-            defaultObservation.Add(new Observation());
-            defaultObservation.Add(new Observation()
+            Observation observation1 = new Observation();
+            Observation observation2 = new Observation()
             {
                 Status = ObsStatus.registered,
                 CategoryCodeSerialised = "12345678",
@@ -124,8 +193,8 @@ namespace ServerExperiment.Models
                 InterpretationDisplay = "Below low normal",
                 InterpretationSystem = "http://hl7.org/fhir/v2/0078",
                 InterpretationText = "low"
-            });
-            defaultObservation.Add(new Observation()
+            };
+            Observation observation3 = new Observation()
             {
                 Status = ObsStatus.registered,
 
@@ -165,11 +234,45 @@ namespace ServerExperiment.Models
                 InterpretationDisplay = "Below low normal",
                 InterpretationSystem = "http://hl7.org/fhir/v2/0078",
                 InterpretationText = "low"
-            });
+            };
+
+            defaultObservation.Add(observation1);
+            defaultObservation.Add(observation2);
+            defaultObservation.Add(observation3);
 
             foreach (Observation observation in defaultObservation)
                 context.Observations.Add(observation);
-            
+
+            IList<ObservationRecord> defaultObservationRecords = new List<ObservationRecord>();
+            defaultObservationRecords.Add(new ObservationRecord()
+            {
+                ObservationId = 1,
+                Observation = observation1,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+            defaultObservationRecords.Add(new ObservationRecord()
+            {
+                ObservationId = 2,
+                Observation = observation2,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+            defaultObservationRecords.Add(new ObservationRecord()
+            {
+                ObservationId = 3,
+                Observation = observation3,
+                VersionId = 1,
+                LastModified = DateTime.UtcNow,
+                Action = ControllerUtils.CREATE
+            });
+
+            foreach (DeviceRecord record in defaultDeviceRecords)
+                context.DeviceRecords.Add(record);
+
+
             base.Seed(context);
         }
     }

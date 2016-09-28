@@ -5,6 +5,9 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Practices.Unity;
+using ServerExperiment.Models.Repository;
+using ServerExperiment.Utils;
 
 namespace ServerExperiment
 {
@@ -16,6 +19,13 @@ namespace ServerExperiment
             // Configure Web API to use only bearer token authentication.
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
+
+            // Configuration of Unity Dependency Resolver
+            var container = new UnityContainer();
+            container.RegisterType<IRepository, PatientRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRepository, DeviceRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRepository, ObservationRepository>(new HierarchicalLifetimeManager());
+            config.DependencyResolver = new UnityResolver(container);
 
             // Web API routes
             config.MapHttpAttributeRoutes();
