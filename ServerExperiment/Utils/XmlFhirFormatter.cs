@@ -23,9 +23,10 @@ namespace ServerExperiment.Utils
             bool canRead = false;
 
             // for single product object
-            if (type == typeof(Hl7.Fhir.Model.Patient) ||
-                type == typeof(Hl7.Fhir.Model.Device)  ||
-                type == typeof(Hl7.Fhir.Model.Observation))
+            if (type == typeof(Hl7.Fhir.Model.Patient)     ||
+                type == typeof(Hl7.Fhir.Model.Device)      ||
+                type == typeof(Hl7.Fhir.Model.Observation) ||
+                type == typeof(Hl7.Fhir.Model.Resource))
             {
                 canRead = true;
 
@@ -41,7 +42,8 @@ namespace ServerExperiment.Utils
             //for single product object
             if (type == typeof(Hl7.Fhir.Model.Patient) ||
                 type == typeof(Hl7.Fhir.Model.Device) ||
-                type == typeof(Hl7.Fhir.Model.Observation))
+                type == typeof(Hl7.Fhir.Model.Observation) ||
+                type == typeof(Hl7.Fhir.Model.Resource))
             {
                 canWrite = true;
 

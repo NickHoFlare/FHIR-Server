@@ -65,10 +65,28 @@ namespace ServerExperiment.Controllers
         [Route("fhir/Patient/{patientId}")]
         [HttpPut]
         [RequireHttps]
-        public HttpResponseMessage Update(Hl7.Fhir.Model.Patient fhirPatient, int patientId)
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int patientId, bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
+            Hl7.Fhir.Model.Patient fhirPatient = null;
+            try
+            {
+                fhirPatient = (Hl7.Fhir.Model.Patient)resource;
+            }
+            catch (Exception ex)
+            {
+                message.Content = new StringContent("Resource is of the wrong type, expecting Patient!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NotFound;
+                return message;
+            }
+
+            if (fhirPatient.Id == null)
+            {
+                message.Content = new StringContent("Patient to be updated should have a logical ID!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.BadRequest;
+                return message;
+            }
             if (patientId != int.Parse(fhirPatient.Id))
             {
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -98,6 +116,10 @@ namespace ServerExperiment.Controllers
                 patientRepository.AddCreateRecord(patient);
                 patientRepository.Save();
 
+                // For testing purposes only.
+                if (test)
+                    patient.PatientId = 7357;
+
                 message.Content = new StringContent("Patient created with ID " + patient.PatientId + "!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificPatient", new { id = patient.PatientId }));
@@ -110,9 +132,21 @@ namespace ServerExperiment.Controllers
         [Route("fhir/Patient")]
         [HttpPost]
         [RequireHttps]
-        public HttpResponseMessage Create(Hl7.Fhir.Model.Patient fhirPatient)
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+
+            Hl7.Fhir.Model.Patient fhirPatient = null;
+            try
+            {
+                fhirPatient = (Hl7.Fhir.Model.Patient)resource;
+            }
+            catch (Exception ex)
+            {
+                message.Content = new StringContent("Resource is of the wrong type, expecting Patient!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NotFound;
+                return message;
+            }
 
             if (fhirPatient.Id != null)
             {
@@ -127,6 +161,10 @@ namespace ServerExperiment.Controllers
 
             patientRepository.AddCreateRecord(patient);
             patientRepository.Save();
+
+            // For testing purposes only.
+            if (test && patient.PatientId == 0)
+                patient.PatientId = 7357;
 
             message.Content = new StringContent("Patient created with ID " + patient.PatientId + "!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -152,6 +190,7 @@ namespace ServerExperiment.Controllers
             if (patient.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.OK;
+                message.ReasonPhrase = "Resource already deleted";
                 return message;
             }
 

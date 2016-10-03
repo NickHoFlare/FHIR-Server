@@ -64,10 +64,27 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Device/{deviceId}")]
         [HttpPut]
         [RequireHttps]
-        public HttpResponseMessage Update(Hl7.Fhir.Model.Device fhirDevice, int deviceId)
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int deviceId, bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+            Hl7.Fhir.Model.Device fhirDevice = null;
+            try
+            {
+                fhirDevice = (Hl7.Fhir.Model.Device)resource;
+            }
+            catch (Exception ex)
+            {
+                message.Content = new StringContent("Resource is of the wrong type, expecting Device!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NotFound;
+                return message;
+            }
 
+            if (fhirDevice.Id == null)
+            {
+                message.Content = new StringContent("Device to be updated should have a logical ID!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.BadRequest;
+                return message;
+            }
             if (deviceId != int.Parse(fhirDevice.Id))
             {
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -97,6 +114,10 @@ namespace ServerExperiment.Controllers.FhirControllers
                 deviceRepository.AddCreateRecord(device);
                 deviceRepository.Save();
 
+                // For testing purposes only.
+                if (test)
+                    device.DeviceId = 7357;
+
                 message.Content = new StringContent("Device created with ID " + device.DeviceId + "!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificDevice", new { id = device.DeviceId }));
@@ -109,9 +130,20 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Device")]
         [HttpPost]
         [RequireHttps]
-        public HttpResponseMessage Create(Hl7.Fhir.Model.Device fhirDevice)
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+            Hl7.Fhir.Model.Device fhirDevice = null;
+            try
+            {
+                fhirDevice = (Hl7.Fhir.Model.Device) resource;
+            }
+            catch (Exception ex)
+            {
+                message.Content = new StringContent("Resource is of the wrong type, expecting Device!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NotFound;
+                return message;
+            }
 
             if (fhirDevice.Id != null)
             {
@@ -126,6 +158,10 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             deviceRepository.AddCreateRecord(device);
             deviceRepository.Save();
+
+            // For testing purposes only.
+            if (test && device.DeviceId == 0)
+                device.DeviceId = 7357;
 
             message.Content = new StringContent("Device created with ID " + device.DeviceId + "!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -148,9 +184,10 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.StatusCode = HttpStatusCode.NoContent;
                 return message;
             }
-            else if (device.IsDeleted == true)
+            if (device.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.OK;
+                message.ReasonPhrase = "Resource already deleted";
                 return message;
             }
 

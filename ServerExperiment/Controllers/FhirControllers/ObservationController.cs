@@ -64,10 +64,28 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Observation/{observationId}")]
         [HttpPut]
         [RequireHttps]
-        public HttpResponseMessage Update(Hl7.Fhir.Model.Observation fhirObservation, int observationId)
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int observationId, bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
+            Hl7.Fhir.Model.Observation fhirObservation = null;
+            try
+            {
+                fhirObservation = (Hl7.Fhir.Model.Observation)resource;
+            }
+            catch (Exception ex)
+            {
+                message.Content = new StringContent("Resource is of the wrong type, expecting Observation!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NotFound;
+                return message;
+            }
+
+            if (fhirObservation.Id == null)
+            {
+                message.Content = new StringContent("Observation to be updated should have a logical ID!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.BadRequest;
+                return message;
+            }
             if (observationId != int.Parse(fhirObservation.Id))
             {
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -96,6 +114,10 @@ namespace ServerExperiment.Controllers.FhirControllers
                 observationRepository.AddCreateRecord(observation);
                 observationRepository.Save();
 
+                // For testing purposes only.
+                if (test)
+                    observation.ObservationId = 7357;
+
                 message.Content = new StringContent("Observation created with ID " + observation.ObservationId + "!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificObservation", new { id = observation.ObservationId }));
@@ -108,9 +130,21 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Observation")]
         [HttpPost]
         [RequireHttps]
-        public HttpResponseMessage Create(Hl7.Fhir.Model.Observation fhirObservation)
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+
+            Hl7.Fhir.Model.Observation fhirObservation = null;
+            try
+            {
+                fhirObservation = (Hl7.Fhir.Model.Observation)resource;
+            }
+            catch (Exception ex)
+            {
+                message.Content = new StringContent("Resource is of the wrong type, expecting Observation!", Encoding.UTF8, "text/html");
+                message.StatusCode = HttpStatusCode.NotFound;
+                return message;
+            }
 
             if (fhirObservation.Id != null)
             {
@@ -125,6 +159,10 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             observationRepository.AddCreateRecord(observation);
             observationRepository.Save();
+
+            // For testing purposes only.
+            if (test && observation.ObservationId == 0)
+                observation.ObservationId = 7357;
 
             message.Content = new StringContent("Observation created with ID " + observation.ObservationId + "!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
@@ -150,6 +188,7 @@ namespace ServerExperiment.Controllers.FhirControllers
             if (observation.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.OK;
+                message.ReasonPhrase = "Resource already deleted";
                 return message;
             }
 
