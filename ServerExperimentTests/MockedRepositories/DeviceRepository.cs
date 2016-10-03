@@ -3,10 +3,12 @@ using ServerExperiment.Models.POCO;
 using System;
 using System.Data.Entity;
 using System.Linq;
+using ServerExperiment.Models;
+using ServerExperiment.Models.Repository;
 
-namespace ServerExperiment.Models.Repository
+namespace ServerExperimentTests.MockedRepositories
 {
-    public class DeviceRepository : IDisposable, IDeviceRepository
+    public class MockedDeviceRepository : IDisposable, IDeviceRepository
     {
         private FhirResourceContext _db = new FhirResourceContext();
 
@@ -23,7 +25,7 @@ namespace ServerExperiment.Models.Repository
         }
 
         public void UpdateResource(IResource device)
-        {          
+        {
             _db.Entry(device).State = EntityState.Modified;
         }
 

@@ -95,11 +95,10 @@ namespace ServerExperiment.Controllers
                 patientRepository.AddResource(patient);
                 patientRepository.Save();
 
-                PatientRecord record = new PatientRecord();
-                patientRepository.AddCreateRecord(patient, record);
+                patientRepository.AddCreateRecord(patient);
                 patientRepository.Save();
 
-                message.Content = new StringContent("Patient created!", Encoding.UTF8, "text/html");
+                message.Content = new StringContent("Patient created with ID " + patient.PatientId + "!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificPatient", new { id = patient.PatientId }));
             }
@@ -126,11 +125,10 @@ namespace ServerExperiment.Controllers
             patientRepository.AddResource(patient);
             patientRepository.Save();
 
-            PatientRecord record = new PatientRecord();
-            patientRepository.AddCreateRecord(patient, record);
+            patientRepository.AddCreateRecord(patient);
             patientRepository.Save();
 
-            message.Content = new StringContent("Patient created!", Encoding.UTF8, "text/html");
+            message.Content = new StringContent("Patient created with ID " + patient.PatientId + "!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
             message.Headers.Location = new Uri(Url.Link("SpecificPatient", new { id = patient.PatientId }));
 

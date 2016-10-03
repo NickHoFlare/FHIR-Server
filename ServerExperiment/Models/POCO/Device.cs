@@ -1,4 +1,5 @@
-﻿using ServerExperiment.Models.FHIR.Helpers.Device;
+﻿using System.CodeDom.Compiler;
+using ServerExperiment.Models.FHIR.Helpers.Device;
 using System.ComponentModel.DataAnnotations;
 
 namespace ServerExperiment.Models.POCO
@@ -12,6 +13,15 @@ namespace ServerExperiment.Models.POCO
 
             DeviceId = 0;
         }
+
+        public Device(int versionId, bool isDeleted, int deviceId)
+        {
+            VersionId = versionId;
+            IsDeleted = isDeleted;
+
+            DeviceId = deviceId;
+        }
+
 
         // Each Record is immutable, in case of updates we create a new record and 
         // keep track of Version, Time of modification and action type like CREATE/UPDATE

@@ -84,7 +84,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 deviceRepository.UpdateResource(device);
                 deviceRepository.AddUpdateRecord(device, record);
 
-                deviceRepository.Save(); // Look out for DbUpdateConcurrencyException
+                deviceRepository.Save();
 
                 message.StatusCode = HttpStatusCode.OK;
                 message.Content = new StringContent("Device with id " + deviceId + " has been modified!", Encoding.UTF8, "text/html");
@@ -94,11 +94,10 @@ namespace ServerExperiment.Controllers.FhirControllers
                 deviceRepository.AddResource(device);
                 deviceRepository.Save();
 
-                DeviceRecord record = new DeviceRecord();
-                deviceRepository.AddCreateRecord(device, record);
+                deviceRepository.AddCreateRecord(device);
                 deviceRepository.Save();
 
-                message.Content = new StringContent("Device created!", Encoding.UTF8, "text/html");
+                message.Content = new StringContent("Device created with ID " + device.DeviceId + "!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificDevice", new { id = device.DeviceId }));
             }
@@ -125,11 +124,10 @@ namespace ServerExperiment.Controllers.FhirControllers
             deviceRepository.AddResource(device);
             deviceRepository.Save();
 
-            DeviceRecord record = new DeviceRecord();
-            deviceRepository.AddCreateRecord(device, record);
+            deviceRepository.AddCreateRecord(device);
             deviceRepository.Save();
 
-            message.Content = new StringContent("Device created!", Encoding.UTF8, "text/html");
+            message.Content = new StringContent("Device created with ID " + device.DeviceId + "!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
             message.Headers.Location = new Uri(Url.Link("SpecificDevice", new { id = device.DeviceId }));
 

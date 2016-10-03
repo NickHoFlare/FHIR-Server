@@ -46,11 +46,11 @@ namespace ServerExperiment.Models.Repository
                                     .First();
         }
 
-        public void AddCreateRecord(IResource patient, IRecord record)
+        public void AddCreateRecord(IResource patient)
         {
-            PatientRecord patientRecord = (PatientRecord)record;
+            var patientRecord = new PatientRecord();
 
-            patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            patientRecord = (PatientRecord)ControllerUtils.AddMetadata(patientRecord, ControllerUtils.CREATE);
             patientRecord.Patient = (Patient)patient;
 
             db.PatientRecords.Add(patientRecord);
@@ -58,9 +58,7 @@ namespace ServerExperiment.Models.Repository
 
         public void AddUpdateRecord(IResource patient, IRecord record)
         {
-            PatientRecord patientRecord = (PatientRecord)record;
-
-            patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            var patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
             patientRecord.Patient = (Patient)patient;
 
             db.PatientRecords.Add(patientRecord);
@@ -68,9 +66,7 @@ namespace ServerExperiment.Models.Repository
 
         public void AddDeleteRecord(IResource patient, IRecord record)
         {
-            PatientRecord patientRecord = (PatientRecord)record;
-
-            patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            var patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
             patientRecord.Patient = (Patient)patient;
 
             db.PatientRecords.Add(patientRecord);

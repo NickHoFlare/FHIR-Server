@@ -93,11 +93,10 @@ namespace ServerExperiment.Controllers.FhirControllers
                 observationRepository.AddResource(observation);
                 observationRepository.Save();
 
-                ObservationRecord record = new ObservationRecord();
-                observationRepository.AddCreateRecord(observation, record);
+                observationRepository.AddCreateRecord(observation);
                 observationRepository.Save();
 
-                message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
+                message.Content = new StringContent("Observation created with ID " + observation.ObservationId + "!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificObservation", new { id = observation.ObservationId }));
             }
@@ -124,11 +123,10 @@ namespace ServerExperiment.Controllers.FhirControllers
             observationRepository.AddResource(observation);
             observationRepository.Save();
 
-            ObservationRecord record = new ObservationRecord();
-            observationRepository.AddCreateRecord(observation, record);
+            observationRepository.AddCreateRecord(observation);
             observationRepository.Save();
 
-            message.Content = new StringContent("Observation created!", Encoding.UTF8, "text/html");
+            message.Content = new StringContent("Observation created with ID " + observation.ObservationId + "!", Encoding.UTF8, "text/html");
             message.StatusCode = HttpStatusCode.Created;
             message.Headers.Location = new Uri(Url.Link("SpecificObservation", new { id = observation.ObservationId }));
 

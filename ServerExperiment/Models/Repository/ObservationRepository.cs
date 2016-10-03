@@ -46,9 +46,11 @@ namespace ServerExperiment.Models.Repository
                                     .First();
         }
 
-        public void AddCreateRecord(IResource observation, IRecord record)
+        public void AddCreateRecord(IResource observation)
         {
-            var observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            var observationRecord = new ObservationRecord();
+
+            observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(observationRecord, ControllerUtils.CREATE);
             observationRecord.Observation = (Observation)observation;
 
             _db.ObservationRecords.Add(observationRecord);

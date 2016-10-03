@@ -100,3 +100,5 @@ C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerE
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperiment\bin\Microsoft.Practices.Unity.xml
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperiment\bin\Microsoft.Practices.Unity.Configuration.xml
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperiment\bin\Microsoft.Practices.Unity.RegistrationByConvention.xml
+C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperiment\bin\Castle.Core.dll
+C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperiment\bin\Castle.Core.xml

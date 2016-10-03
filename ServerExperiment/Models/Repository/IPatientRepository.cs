@@ -10,7 +10,7 @@ namespace ServerExperiment.Models.Repository
         void DeleteResource(IResource resource);
         bool ResourceExists(int resourceId);
         IRecord GetLatestRecord(int resourceId);
-        void AddCreateRecord(IResource resource, IRecord record);
+        void AddCreateRecord(IResource resource);
         void AddUpdateRecord(IResource resource, IRecord record);
         void AddDeleteRecord(IResource resource, IRecord record);
         void Save();
