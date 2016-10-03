@@ -15,10 +15,15 @@ namespace ServerExperiment.Controllers
     {
         //private PatientRepository patientRepository = new PatientRepository();
 
-        private IPatientRepository patientRepository;
+        private readonly IPatientRepository patientRepository;
 
         public PatientController(IPatientRepository repository)
         {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
             this.patientRepository = repository;
         }
 
@@ -37,7 +42,7 @@ namespace ServerExperiment.Controllers
                 message.Content = new StringContent("Patient with id "+patientId+" not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            else if (patient.IsDeleted == true)
+            if (patient.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.Gone;
                 message.Content = new StringContent("Patient with id " + patientId + " has been deleted!", Encoding.UTF8, "text/html");

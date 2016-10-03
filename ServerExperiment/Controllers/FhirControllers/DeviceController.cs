@@ -14,10 +14,15 @@ namespace ServerExperiment.Controllers.FhirControllers
     {
         //private DeviceRepository deviceRepository = new DeviceRepository();
 
-        private IDeviceRepository deviceRepository;
+        private readonly IDeviceRepository deviceRepository;
 
         public DeviceController(IDeviceRepository repository)
         {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
             this.deviceRepository = repository;
         }
 
@@ -36,7 +41,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            else if (device.IsDeleted)
+            if (device.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.Gone;
                 message.Content = new StringContent("Device with id " + deviceId + " has been deleted!", Encoding.UTF8, "text/html");

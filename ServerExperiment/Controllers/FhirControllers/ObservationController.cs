@@ -14,10 +14,15 @@ namespace ServerExperiment.Controllers.FhirControllers
     {
         //private ObservationRepository observationRepository = new ObservationRepository();
 
-        private IObservationRepository observationRepository;
+        private readonly IObservationRepository observationRepository;
 
         public ObservationController(IObservationRepository repository)
         {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
             this.observationRepository = repository;
         }
 
@@ -36,7 +41,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("observation with id " + observationId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            else if (observation.IsDeleted == true)
+            if (observation.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.Gone;
                 message.Content = new StringContent("Observation with id " + observationId + " has been deleted!", Encoding.UTF8, "text/html");
