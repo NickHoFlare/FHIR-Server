@@ -1,10 +1,7 @@
 ﻿using ServerExperiment.Controllers.FhirControllers;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace ServerExperiment.Models.POCO
 {
@@ -18,7 +15,7 @@ namespace ServerExperiment.Models.POCO
             Action = ControllerUtils.UNASSIGNED;
         }
 
-        public ObservationRecord(int recordId, int versionId, DateTime lastModified, string action, bool isDeleted)
+        public ObservationRecord(int recordId, int versionId, DateTime lastModified, string action)
         {
             RecordId = recordId;
             VersionId = versionId;

@@ -33,9 +33,15 @@ namespace ServerExperiment.Models.FHIR.Mappers
             {
                 if (source.Type.Coding != null && source.Type.Coding.Count > 0)
                 {
-                    device.TypeCode = source.Type.Coding.FirstOrDefault().Code;
-                    device.TypeDisplay = source.Type.Coding.FirstOrDefault().Display;
-                    device.TypeSystem = source.Type.Coding.FirstOrDefault().System;
+                    var coding = source.Type.Coding.FirstOrDefault();
+                    if (coding != null)
+                        device.TypeCode = coding.Code;
+                    var display = source.Type.Coding.FirstOrDefault();
+                    if (display != null)
+                        device.TypeDisplay = display.Display;
+                    var system = source.Type.Coding.FirstOrDefault();
+                    if (system != null)
+                        device.TypeSystem = system.System;
                 }
                 if (source.Type.Text != null)
                     device.TypeText = source.Type.Text;
@@ -88,9 +94,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 throw new ArgumentNullException("device");
             }
 
-            var resource = new Device();
-
-            resource.Id = device.DeviceId.ToString("D");
+            var resource = new Device {Id = device.DeviceId.ToString("D")};
 
             // Device Type
             if (device.TypeCode != null || device.TypeDisplay != null || device.TypeSystem != null || device.TypeText != null)

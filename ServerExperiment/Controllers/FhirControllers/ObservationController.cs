@@ -144,7 +144,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.StatusCode = HttpStatusCode.NoContent;
                 return message;
             }
-            else if (observation.IsDeleted == true)
+            if (observation.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.OK;
                 return message;

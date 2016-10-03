@@ -269,8 +269,8 @@ namespace ServerExperiment.Models
                 Action = ControllerUtils.CREATE
             });
 
-            foreach (DeviceRecord record in defaultDeviceRecords)
-                context.DeviceRecords.Add(record);
+            foreach (ObservationRecord record in defaultObservationRecords)
+                context.ObservationRecords.Add(record);
 
 
             base.Seed(context);

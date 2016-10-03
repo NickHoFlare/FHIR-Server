@@ -1,86 +1,78 @@
 ﻿using ServerExperiment.Controllers.FhirControllers;
 using ServerExperiment.Models.POCO;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 
 namespace ServerExperiment.Models.Repository
 {
     public class ObservationRepository : IDisposable, IObservationRepository
     {
-        private FhirResourceContext db = new FhirResourceContext();
+        private FhirResourceContext _db = new FhirResourceContext();
 
         public IResource GetResourceByID(int observationId)
         {
-            return db.Observations.FirstOrDefault(p => p.ObservationId == observationId);
+            return _db.Observations.FirstOrDefault(p => p.ObservationId == observationId);
         }
 
         public void AddResource(IResource observation)
         {
             observation.IsDeleted = false;
 
-            db.Observations.Add((Observation)observation);
+            _db.Observations.Add((Observation)observation);
         }
 
         public void UpdateResource(IResource observation)
         {
-            db.Entry(observation).State = EntityState.Modified;
+            _db.Entry(observation).State = EntityState.Modified;
         }
 
         public void DeleteResource(IResource observation)
         {
             observation.IsDeleted = true;
 
-            db.Entry(observation).State = EntityState.Modified;
+            _db.Entry(observation).State = EntityState.Modified;
         }
 
         public bool ResourceExists(int observationId)
         {
-            return db.Observations.Count(e => e.ObservationId == observationId) > 0;
+            return _db.Observations.Count(e => e.ObservationId == observationId) > 0;
         }
 
         public IRecord GetLatestRecord(int observationId)
         {
-            return db.ObservationRecords.Where(rec => rec.ObservationId == observationId)
+            return _db.ObservationRecords.Where(rec => rec.ObservationId == observationId)
                                     .OrderByDescending(rec => rec.LastModified)
                                     .First();
         }
 
         public void AddCreateRecord(IResource observation, IRecord record)
         {
-            ObservationRecord observationRecord = (ObservationRecord)record;
-
-            observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            var observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
             observationRecord.Observation = (Observation)observation;
 
-            db.ObservationRecords.Add(observationRecord);
+            _db.ObservationRecords.Add(observationRecord);
         }
 
         public void AddUpdateRecord(IResource observation, IRecord record)
         {
-            ObservationRecord observationRecord = (ObservationRecord)record;
-
-            observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            var observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
             observationRecord.Observation = (Observation)observation;
 
-            db.ObservationRecords.Add(observationRecord);
+            _db.ObservationRecords.Add(observationRecord);
         }
 
         public void AddDeleteRecord(IResource observation, IRecord record)
         {
-            ObservationRecord observationRecord = (ObservationRecord)record;
-
-            observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            var observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
             observationRecord.Observation = (Observation)observation;
 
-            db.ObservationRecords.Add(observationRecord);
+            _db.ObservationRecords.Add(observationRecord);
         }
 
         public void Save()
         {
-            db.SaveChanges();
+            _db.SaveChanges();
         }
 
         #region Dispose Code
@@ -88,10 +80,10 @@ namespace ServerExperiment.Models.Repository
         {
             if (disposing)
             {
-                if (db != null)
+                if (_db != null)
                 {
-                    db.Dispose();
-                    db = null;
+                    _db.Dispose();
+                    _db = null;
                 }
             }
         }

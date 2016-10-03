@@ -1,6 +1,4 @@
-﻿using ServerExperiment.Controllers.FhirControllers;
-using ServerExperiment.Models.FHIR.Helpers.Device;
-using System;
+﻿using ServerExperiment.Models.FHIR.Helpers.Device;
 using System.ComponentModel.DataAnnotations;
 
 namespace ServerExperiment.Models.POCO

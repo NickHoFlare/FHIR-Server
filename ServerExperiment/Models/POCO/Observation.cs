@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using ServerExperiment.Models.FHIR.Helpers.Observation;
-using ServerExperiment.Controllers.FhirControllers;
 
 namespace ServerExperiment.Models.POCO
 {
@@ -34,16 +33,16 @@ namespace ServerExperiment.Models.POCO
             _valueQuantitySystem = new List<string>();
             _valueQuantityUnit = new List<string>();
             _valueQuantityValue = new List<decimal>();
-            _ValueSampledDataData = new List<string>();
+            _valueSampledDataData = new List<string>();
             _valueSampledDataDimensions = new List<int>();
             _valueSampledDataOriginCode = new List<string>();
             _valueSampledDataOriginSystem = new List<string>();
-            _ValueSampledDataOriginUnit = new List<string>();
+            _valueSampledDataOriginUnit = new List<string>();
             _valueSampledDataOriginValue = new List<decimal>();
             _valueSampledDataPeriod = new List<decimal>();
             _valueString = new List<string>();
             _valueSystem = new List<string>();
-            _ValueText = new List<string>();
+            _valueText = new List<string>();
 
             EffectiveDateTime = DateTime.UtcNow;
             EffectivePeriodEnd = DateTime.UtcNow;
@@ -263,14 +262,26 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> quantityValues = value.Split(';').ToList();
-                if (quantityValues[0] == string.Empty)
+                List<string> quantityValues;
+                if (value != null)
                 {
-                    _valueQuantityValue = null;
+                    quantityValues = value.Split(';').ToList();
                 }
                 else
                 {
-                    _valueQuantityValue = quantityValues.Select(decimal.Parse).ToList();
+                    quantityValues = null;
+                }
+
+                if (quantityValues != null)
+                {
+                    if (quantityValues[0] == string.Empty)
+                    {
+                        _valueQuantityValue = null;
+                    }
+                    else
+                    {
+                       _valueQuantityValue = quantityValues.Select(decimal.Parse).ToList();
+                    }
                 }
                 //_valueQuantityValue = value.Split(';').ToList().Select(decimal.Parse).ToList();
             }
@@ -308,20 +319,20 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueDisplaySerialised
         {
-            get { return String.Join(";", _valueDisplay); }
+            get { return string.Join(";", _valueDisplay); }
             set { _valueDisplay = value.Split(';').ToList(); }
         }
 
-        private List<string> _ValueText;
+        private List<string> _valueText;
         public List<string> ValueText
         {
-            get { return _ValueText; }
-            set { _ValueText = value; }
+            get { return _valueText; }
+            set { _valueText = value; }
         }
         public string ValueTextSerialised
         {
-            get { return String.Join(";", _ValueText); }
-            set { _ValueText = value.Split(';').ToList(); }
+            get { return string.Join(";", _valueText); }
+            set { _valueText = value.Split(';').ToList(); }
         }
 
         private List<string> _valueString;
@@ -332,7 +343,7 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueStringSerialised
         {
-            get { return String.Join(";", _valueString); }
+            get { return string.Join(";", _valueString); }
             set { _valueString = value.Split(';').ToList(); }
         }
 
@@ -344,7 +355,7 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueSampledDataOriginSystemSerialised
         {
-            get { return String.Join(";", _valueSampledDataOriginSystem); }
+            get { return string.Join(";", _valueSampledDataOriginSystem); }
             set { _valueSampledDataOriginSystem = value.Split(';').ToList(); }
         }
 
@@ -356,20 +367,20 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueSampledDataOriginCodeSerialised
         {
-            get { return String.Join(";", _valueSampledDataOriginCode); }
+            get { return string.Join(";", _valueSampledDataOriginCode); }
             set { _valueSampledDataOriginCode = value.Split(';').ToList(); }
         }
 
-        private List<string> _ValueSampledDataOriginUnit;
+        private List<string> _valueSampledDataOriginUnit;
         public List<string> ValueSampledDataOriginUnit
         {
-            get { return _ValueSampledDataOriginUnit; }
-            set { _ValueSampledDataOriginUnit = value; }
+            get { return _valueSampledDataOriginUnit; }
+            set { _valueSampledDataOriginUnit = value; }
         }
         public string ValueSampledDataOriginUnitSerialised
         {
-            get { return String.Join(";", _ValueSampledDataOriginUnit); }
-            set { _ValueSampledDataOriginUnit = value.Split(';').ToList(); }
+            get { return string.Join(";", _valueSampledDataOriginUnit); }
+            set { _valueSampledDataOriginUnit = value.Split(';').ToList(); }
         }
 
         private List<decimal> _valueSampledDataOriginValue;
@@ -385,15 +396,13 @@ namespace ServerExperiment.Models.POCO
                 if (_valueSampledDataOriginValue == null)
                     return null;
                 else
-                    return String.Join(";", _valueSampledDataOriginValue);
+                    return string.Join(";", _valueSampledDataOriginValue);
             }
             set
             {
-                List<string> sampledDataValues;
-
                 if (value != null)
                 {
-                    sampledDataValues = value.Split(';').ToList();
+                    var sampledDataValues = value.Split(';').ToList();
 
                     if (sampledDataValues[0] == string.Empty)
                     {
@@ -426,15 +435,13 @@ namespace ServerExperiment.Models.POCO
                 if (_valueSampledDataPeriod == null)
                     return null;
                 else
-                    return String.Join(";", _valueSampledDataPeriod);
+                    return string.Join(";", _valueSampledDataPeriod);
             }
             set
             {
-                List<string> sampledDataPeriods;
-
                 if (value != null)
                 {
-                    sampledDataPeriods = value.Split(';').ToList();
+                    var sampledDataPeriods = value.Split(';').ToList();
 
                     if (sampledDataPeriods[0] == string.Empty)
                     {
@@ -471,11 +478,9 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> sampledDataDimensions;
-
                 if (value != null)
                 {
-                    sampledDataDimensions = value.Split(';').ToList();
+                    var sampledDataDimensions = value.Split(';').ToList();
 
                     if (sampledDataDimensions[0] == string.Empty)
                     {
@@ -495,16 +500,16 @@ namespace ServerExperiment.Models.POCO
             }
         }
 
-        private List<string> _ValueSampledDataData;
+        private List<string> _valueSampledDataData;
         public List<string> ValueSampledDataData
         {
-            get { return _ValueSampledDataData; }
-            set { _ValueSampledDataData = value; }
+            get { return _valueSampledDataData; }
+            set { _valueSampledDataData = value; }
         }
         public string ValueSampledDataDataSerialised
         {
-            get { return String.Join(";", _ValueSampledDataData); }
-            set { _ValueSampledDataData = value.Split(';').ToList(); }
+            get { return String.Join(";", _valueSampledDataData); }
+            set { _valueSampledDataData = value.Split(';').ToList(); }
         }
 
         private List<DateTime> _valuePeriodStart;
@@ -524,11 +529,9 @@ namespace ServerExperiment.Models.POCO
             }
             set
             {
-                List<string> valuePeriodStarts;
-
                 if (value != null)
                 {
-                    valuePeriodStarts = value.Split(';').ToList();
+                    var valuePeriodStarts = value.Split(';').ToList();
 
                     if (valuePeriodStarts[0] == string.Empty)
                     {
@@ -561,15 +564,13 @@ namespace ServerExperiment.Models.POCO
                 if (_valuePeriodEnd == null)
                     return null;
                 else
-                    return String.Join(";", _valuePeriodEnd);
+                    return string.Join(";", _valuePeriodEnd);
             }
             set
             {
-                List<string> valuePeriodEnds;
-
                 if (value != null)
                 {
-                    valuePeriodEnds = value.Split(';').ToList();
+                    var valuePeriodEnds = value.Split(';').ToList();
 
                     if (valuePeriodEnds[0] == string.Empty)
                     {

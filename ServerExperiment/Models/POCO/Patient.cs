@@ -1,5 +1,4 @@
-﻿using ServerExperiment.Controllers.FhirControllers;
-using ServerExperiment.Models.FHIR.Helpers.Patient;
+﻿using ServerExperiment.Models.FHIR.Helpers.Patient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

@@ -171,7 +171,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
 
             var resource = new Patient();
 
-            resource.Id = patient.PatientId.ToString("D"); // wtf does this line do
+            resource.Id = patient.PatientId.ToString("D");
 
             // Patient bools
             resource.Active = patient.Active;
@@ -229,14 +229,11 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             }
 
             // Patient Telecom
-            ContactPoint phone = null;
-            ContactPoint mobile = null;
-            ContactPoint email = null;
             List<ContactPoint> contactPoints= new List<ContactPoint>();
 
             if (patient.Phone != null)
             {
-                phone = new ContactPoint()
+                var phone = new ContactPoint()
                 {
                     Value = patient.Phone,
                     System = ContactPoint.ContactPointSystem.Phone,
@@ -246,7 +243,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             }
             if (patient.Mobile != null)
             {
-                mobile = new ContactPoint()
+                var mobile = new ContactPoint()
                 {
                     Value = patient.Mobile,
                     System = ContactPoint.ContactPointSystem.Phone,
@@ -256,7 +253,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             }
             if (patient.Email != null)
             {
-                email = new ContactPoint()
+                var email = new ContactPoint()
                 {
                     Value = patient.Email,
                     System = ContactPoint.ContactPointSystem.Email,
@@ -305,11 +302,13 @@ namespace ServerExperiment.POCO.FHIR.Mappers
 
             // Make use of extensions ...
             //
-            
-            resource.Extension = new List<Extension>(1);
-            resource.Extension.Add(new Extension("http://www.englishclub.com/vocabulary/world-countries-nationality.htm",
-                                                    new FhirString(patient.Nationality)
-                                                    ));
+
+            resource.Extension = new List<Extension>(1)
+            {
+                new Extension("http://www.englishclub.com/vocabulary/world-countries-nationality.htm",
+                    new FhirString(patient.Nationality)
+                )
+            };
             return resource;
         }
     }

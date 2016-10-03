@@ -146,7 +146,7 @@ namespace ServerExperiment.Controllers
                 message.StatusCode = HttpStatusCode.NoContent;
                 return message;
             }
-            else if (patient.IsDeleted == true)
+            if (patient.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.OK;
                 return message;

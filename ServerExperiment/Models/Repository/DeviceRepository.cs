@@ -8,77 +8,71 @@ namespace ServerExperiment.Models.Repository
 {
     public class DeviceRepository : IDisposable, IDeviceRepository
     {
-        private FhirResourceContext db = new FhirResourceContext();
+        private FhirResourceContext _db = new FhirResourceContext();
 
         public IResource GetResourceByID(int deviceId)
         {
-            return db.Devices.FirstOrDefault(p => p.DeviceId == deviceId);
+            return _db.Devices.FirstOrDefault(p => p.DeviceId == deviceId);
         }
 
         public void AddResource(IResource device)
         {
             device.IsDeleted = false;
 
-            db.Devices.Add((Device)device);
+            _db.Devices.Add((Device)device);
         }
 
         public void UpdateResource(IResource device)
         {
-            db.Entry(device).State = EntityState.Modified;
+            _db.Entry(device).State = EntityState.Modified;
         }
 
         public void DeleteResource(IResource device)
         {
             device.IsDeleted = true;
 
-            db.Entry(device).State = EntityState.Modified;
+            _db.Entry(device).State = EntityState.Modified;
         }
 
         public bool ResourceExists(int deviceId)
         {
-            return db.Devices.Count(e => e.DeviceId == deviceId) > 0;
+            return _db.Devices.Count(e => e.DeviceId == deviceId) > 0;
         }
 
         public IRecord GetLatestRecord(int deviceId)
         {
-            return db.DeviceRecords.Where(rec => rec.DeviceId == deviceId)
+            return _db.DeviceRecords.Where(rec => rec.DeviceId == deviceId)
                                     .OrderByDescending(rec => rec.LastModified)
                                     .First();
         }
 
         public void AddCreateRecord(IResource device, IRecord record)
         {
-            DeviceRecord deviceRecord = (DeviceRecord)record;
-
-            deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
+            var deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.CREATE);
             deviceRecord.Device = (Device)device;
 
-            db.DeviceRecords.Add(deviceRecord);
+            _db.DeviceRecords.Add(deviceRecord);
         }
 
         public void AddUpdateRecord(IResource device, IRecord record)
         {
-            DeviceRecord deviceRecord = (DeviceRecord)record;
-
-            deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
+            var deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
             deviceRecord.Device = (Device)device;
 
-            db.DeviceRecords.Add(deviceRecord);
+            _db.DeviceRecords.Add(deviceRecord);
         }
 
         public void AddDeleteRecord(IResource device, IRecord record)
         {
-            DeviceRecord deviceRecord = (DeviceRecord)record;
-
-            deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
+            var deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
             deviceRecord.Device = (Device)device;
 
-            db.DeviceRecords.Add(deviceRecord);
+            _db.DeviceRecords.Add(deviceRecord);
         }
 
         public void Save()
         {
-            db.SaveChanges();
+            _db.SaveChanges();
         }
 
         #region Dispose Code
@@ -86,10 +80,10 @@ namespace ServerExperiment.Models.Repository
         {
             if (disposing)
             {
-                if (db != null)
+                if (_db != null)
                 {
-                    db.Dispose();
-                    db = null;
+                    _db.Dispose();
+                    _db = null;
                 }
             }
         }

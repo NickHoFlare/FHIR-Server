@@ -36,7 +36,7 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.Content = new StringContent("Device with id " + deviceId + " not found!", Encoding.UTF8, "text/html");
                 return message;
             }
-            else if (device.IsDeleted == true)
+            else if (device.IsDeleted)
             {
                 message.StatusCode = HttpStatusCode.Gone;
                 message.Content = new StringContent("Device with id " + deviceId + " has been deleted!", Encoding.UTF8, "text/html");

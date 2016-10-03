@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Web;
 using Hl7.Fhir.Model;
 using static Hl7.Fhir.Model.Observation;
 using ServerExperiment.Models.FHIR.Helpers.Observation;
@@ -438,10 +438,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 {
                     ComponentComponent component = new ComponentComponent();
                     CodeableConcept concept = new CodeableConcept();
-                    Coding coding = new Coding();
-                    coding.Code = observation.ComponentCodeCode[i];
-                    coding.Display = observation.ComponentCodeDisplay[i];
-                    coding.System = observation.ComponentCodeSystem[i];
+                    Coding coding = new Coding
+                    {
+                        Code = observation.ComponentCodeCode[i],
+                        Display = observation.ComponentCodeDisplay[i],
+                        System = observation.ComponentCodeSystem[i]
+                    };
                     concept.Coding.Add(coding);
                     concept.Text = observation.ComponentCodeText;
                     component.Code = concept;
@@ -451,11 +453,13 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     // value is of Type Quantity
                     if (observation.ValueQuantityValue != null)
                     {
-                        Quantity quantity = new Quantity();
-                        quantity.Code = observation.ValueQuantityCode[i];
-                        quantity.System = observation.ValueQuantitySystem[i];
-                        quantity.Unit = observation.ValueQuantityUnit[i];
-                        quantity.Value = observation.ValueQuantityValue[i];
+                        Quantity quantity = new Quantity
+                        {
+                            Code = observation.ValueQuantityCode[i],
+                            System = observation.ValueQuantitySystem[i],
+                            Unit = observation.ValueQuantityUnit[i],
+                            Value = observation.ValueQuantityValue[i]
+                        };
 
                         resource.Component[i].Value = quantity;
                     }
@@ -463,10 +467,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     else if (observation.ValueCode[0] != string.Empty)
                     {
                         concept = new CodeableConcept();
-                        coding = new Coding();
-                        coding.Code = observation.ValueCode[i];
-                        coding.Display = observation.ValueDisplay[i];
-                        coding.System = observation.ValueSystem[i];
+                        coding = new Coding
+                        {
+                            Code = observation.ValueCode[i],
+                            Display = observation.ValueDisplay[i],
+                            System = observation.ValueSystem[i]
+                        };
 
                         concept.Coding.Add(coding);
                         concept.Text = observation.ValueText[i];
@@ -483,26 +489,32 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     // value is of Type SampledData
                     else if (observation.ValueSampledDataOriginValue != null)
                     {
-                        SampledData sampleData = new SampledData();
-                        SimpleQuantity quantity = new SimpleQuantity();
-                        quantity.Code = observation.ValueSampledDataOriginCode[i];
-                        quantity.System = observation.ValueSampledDataOriginSystem[i];
-                        quantity.Unit = observation.ValueSampledDataOriginUnit[i];
-                        quantity.Value = observation.ValueSampledDataOriginValue[i];
+                        SimpleQuantity quantity = new SimpleQuantity
+                        {
+                            Code = observation.ValueSampledDataOriginCode[i],
+                            System = observation.ValueSampledDataOriginSystem[i],
+                            Unit = observation.ValueSampledDataOriginUnit[i],
+                            Value = observation.ValueSampledDataOriginValue[i]
+                        };
 
-                        sampleData.Origin = quantity;
-                        sampleData.Data = observation.ValueSampledDataData[i];
-                        sampleData.Dimensions = observation.ValueSampledDataDimensions[i];
-                        sampleData.Period = observation.ValueSampledDataPeriod[i];
+                        SampledData sampleData = new SampledData
+                        {
+                            Origin = quantity,
+                            Data = observation.ValueSampledDataData[i],
+                            Dimensions = observation.ValueSampledDataDimensions[i],
+                            Period = observation.ValueSampledDataPeriod[i]
+                        };
 
                         resource.Component[i].Value = sampleData;
                     }
                     // value is of Type Period 
                     else if (observation.ValuePeriodStart != null)
                     {
-                        Period period = new Period();
-                        period.Start = observation.ValuePeriodStart[i].ToString();
-                        period.End = observation.ValuePeriodEnd[i].ToString();
+                        Period period = new Period
+                        {
+                            Start = observation.ValuePeriodStart[i].ToString(CultureInfo.InvariantCulture),
+                            End = observation.ValuePeriodEnd[i].ToString(CultureInfo.InvariantCulture)
+                        };
 
                         resource.Component[i].Value = period;
                     } 
@@ -519,11 +531,13 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 // value is of Type Quantity
                 if (observation.ValueQuantityValue != null)
                 {
-                    Quantity quantity = new Quantity();
-                    quantity.Code = observation.ValueQuantityCode[0];
-                    quantity.System = observation.ValueQuantitySystem[0];
-                    quantity.Unit = observation.ValueQuantityUnit[0];
-                    quantity.Value = observation.ValueQuantityValue[0];
+                    Quantity quantity = new Quantity
+                    {
+                        Code = observation.ValueQuantityCode[0],
+                        System = observation.ValueQuantitySystem[0],
+                        Unit = observation.ValueQuantityUnit[0],
+                        Value = observation.ValueQuantityValue[0]
+                    };
 
                     resource.Value = quantity;
                 }
@@ -531,10 +545,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 else if (observation.ValueCode[0] != string.Empty)
                 {
                     CodeableConcept concept = new CodeableConcept();
-                    Coding coding = new Coding();
-                    coding.Code = observation.ValueCode[0];
-                    coding.Display = observation.ValueDisplay[0];
-                    coding.System = observation.ValueSystem[0];
+                    Coding coding = new Coding
+                    {
+                        Code = observation.ValueCode[0],
+                        Display = observation.ValueDisplay[0],
+                        System = observation.ValueSystem[0]
+                    };
 
                     concept.Coding.Add(coding);
                     concept.Text = observation.ValueText[0];
@@ -551,26 +567,32 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 // value is of Type SampledData
                 else if (observation.ValueSampledDataOriginValue != null)
                 {
-                    SampledData sampleData = new SampledData();
-                    SimpleQuantity quantity = new SimpleQuantity();
-                    quantity.Code = observation.ValueSampledDataOriginCode[0];
-                    quantity.System = observation.ValueSampledDataOriginSystem[0];
-                    quantity.Unit = observation.ValueSampledDataOriginUnit[0];
-                    quantity.Value = observation.ValueSampledDataOriginValue[0];
+                    SimpleQuantity quantity = new SimpleQuantity
+                    {
+                        Code = observation.ValueSampledDataOriginCode[0],
+                        System = observation.ValueSampledDataOriginSystem[0],
+                        Unit = observation.ValueSampledDataOriginUnit[0],
+                        Value = observation.ValueSampledDataOriginValue[0]
+                    };
 
-                    sampleData.Origin = quantity;
-                    sampleData.Data = observation.ValueSampledDataData[0];
-                    sampleData.Dimensions = observation.ValueSampledDataDimensions[0];
-                    sampleData.Period = observation.ValueSampledDataPeriod[0];
+                    SampledData sampleData = new SampledData
+                    {
+                        Origin = quantity,
+                        Data = observation.ValueSampledDataData[0],
+                        Dimensions = observation.ValueSampledDataDimensions[0],
+                        Period = observation.ValueSampledDataPeriod[0]
+                    };
 
                     resource.Value = sampleData;
                 }
                 // value is of Type Period 
                 else if (observation.ValuePeriodStart != null)
                 {
-                    Period period = new Period();
-                    period.Start = observation.ValuePeriodStart[0].ToString();
-                    period.End = observation.ValuePeriodEnd[0].ToString();
+                    Period period = new Period
+                    {
+                        Start = observation.ValuePeriodStart[0].ToString(CultureInfo.InvariantCulture),
+                        End = observation.ValuePeriodEnd[0].ToString(CultureInfo.InvariantCulture)
+                    };
 
                     resource.Value = period;
                 }

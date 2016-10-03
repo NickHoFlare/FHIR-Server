@@ -291,7 +291,6 @@
     <Compile Include="Models\POCO\PatientRecord.cs" />
     <Compile Include="Models\Repository\IPatientRepository.cs" />
     <Compile Include="Models\Repository\IDeviceRepository.cs" />
-    <Compile Include="Models\Repository\ShittyRepository.cs" />
     <Compile Include="Models\Repository\IObservationRepository.cs" />
     <Compile Include="Models\Repository\ObservationRepository.cs" />
     <Compile Include="Models\Repository\DeviceRepository.cs" />
