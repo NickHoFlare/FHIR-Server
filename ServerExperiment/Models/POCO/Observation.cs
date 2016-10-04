@@ -71,8 +71,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CategorySystemSerialised
         {
-            get { return string.Join(";", _categorySystem); }
-            set { _categorySystem = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_categorySystem); }
+            set { _categorySystem = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _categoryCode;
         public List<string> CategoryCode
@@ -82,8 +82,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CategoryCodeSerialised
         {
-            get { return String.Join(";", _categoryCode); }
-            set { _categoryCode = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_categoryCode); }
+            set { _categoryCode = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _categoryDisplay;
         public List<string> CategoryDisplay
@@ -93,8 +93,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CategoryDisplaySerialised
         {
-            get { return String.Join(";", _categoryDisplay); }
-            set { _categoryDisplay = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_categoryDisplay); }
+            set { _categoryDisplay = ModelUtils.DeserialiseString(value); }
         }
         public string CategoryText { get; set; }
 
@@ -107,8 +107,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CodeSystemSerialised
         {
-            get { return String.Join(";", _codeSystem); }
-            set { _codeSystem = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_codeSystem); }
+            set { _codeSystem = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _codeCode;
         public List<string> CodeCode
@@ -118,8 +118,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CodeCodeSerialised
         {
-            get { return String.Join(";", _codeCode); }
-            set { _codeCode = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_codeCode); }
+            set { _codeCode = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _codeDisplay;
         public List<string> CodeDisplay
@@ -129,8 +129,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CodeDisplaySerialised
         {
-            get { return String.Join(";", _codeDisplay); }
-            set { _codeDisplay = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_codeDisplay); }
+            set { _codeDisplay = ModelUtils.DeserialiseString(value); }
         }
         public string CodeText { get; set; }
 
@@ -145,8 +145,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string PerformerReferencesSerialised
         {
-            get { return String.Join(";", _performerReferences); }
-            set { _performerReferences = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_performerReferences); }
+            set { _performerReferences = ModelUtils.DeserialiseString(value); }
         }
         
         // Observation effective times
@@ -180,8 +180,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ComponentCodeSystemSerialised
         {
-            get { return String.Join(";", _componentCodeSystem); }
-            set { _componentCodeSystem = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_componentCodeSystem); }
+            set { _componentCodeSystem = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _componentCodeCode;
@@ -192,8 +192,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ComponentCodeCodeSerialised
         {
-            get { return String.Join(";", _componentCodeCode); }
-            set { _componentCodeCode = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_componentCodeCode); }
+            set { _componentCodeCode = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _componentCodeDisplay;
@@ -204,8 +204,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ComponentCodeDisplaySerialised
         {
-            get { return String.Join(";", _componentCodeDisplay); }
-            set { _componentCodeDisplay = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_componentCodeDisplay); }
+            set { _componentCodeDisplay = ModelUtils.DeserialiseString(value); }
         }
         public string ComponentCodeText { get; set; }
 
@@ -217,8 +217,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueQuantitySystemSerialised
         {
-            get { return String.Join(";", _valueQuantitySystem); }
-            set { _valueQuantitySystem = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueQuantitySystem); }
+            set { _valueQuantitySystem = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueQuantityCode;
@@ -229,8 +229,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueQuantityCodeSerialised
         {
-            get { return String.Join(";", _valueQuantityCode); }
-            set { _valueQuantityCode = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueQuantityCode); }
+            set { _valueQuantityCode = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueQuantityUnit;
@@ -241,8 +241,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueQuantityUnitSerialised
         {
-            get { return String.Join(";", _valueQuantityUnit); }
-            set { _valueQuantityUnit = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueQuantityUnit); }
+            set { _valueQuantityUnit = ModelUtils.DeserialiseString(value); }
         }
 
         private List<decimal> _valueQuantityValue;
@@ -295,8 +295,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueSystemSerialised
         {
-            get { return String.Join(";", _valueSystem); }
-            set { _valueSystem = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueSystem); }
+            set { _valueSystem = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueCode;
@@ -307,8 +307,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueCodeSerialised
         {
-            get { return String.Join(";", _valueCode); }
-            set { _valueCode = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueCode); }
+            set { _valueCode = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueDisplay;
@@ -319,8 +319,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueDisplaySerialised
         {
-            get { return string.Join(";", _valueDisplay); }
-            set { _valueDisplay = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueDisplay); }
+            set { _valueDisplay = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueText;
@@ -331,8 +331,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueTextSerialised
         {
-            get { return string.Join(";", _valueText); }
-            set { _valueText = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueText); }
+            set { _valueText = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueString;
@@ -343,8 +343,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueStringSerialised
         {
-            get { return string.Join(";", _valueString); }
-            set { _valueString = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueString); }
+            set { _valueString = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueSampledDataOriginSystem;
@@ -355,8 +355,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueSampledDataOriginSystemSerialised
         {
-            get { return string.Join(";", _valueSampledDataOriginSystem); }
-            set { _valueSampledDataOriginSystem = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueSampledDataOriginSystem); }
+            set { _valueSampledDataOriginSystem = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueSampledDataOriginCode;
@@ -367,8 +367,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueSampledDataOriginCodeSerialised
         {
-            get { return string.Join(";", _valueSampledDataOriginCode); }
-            set { _valueSampledDataOriginCode = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueSampledDataOriginCode); }
+            set { _valueSampledDataOriginCode = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _valueSampledDataOriginUnit;
@@ -379,8 +379,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueSampledDataOriginUnitSerialised
         {
-            get { return string.Join(";", _valueSampledDataOriginUnit); }
-            set { _valueSampledDataOriginUnit = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueSampledDataOriginUnit); }
+            set { _valueSampledDataOriginUnit = ModelUtils.DeserialiseString(value); }
         }
 
         private List<decimal> _valueSampledDataOriginValue;
@@ -396,7 +396,7 @@ namespace ServerExperiment.Models.POCO
                 if (_valueSampledDataOriginValue == null)
                     return null;
                 else
-                    return string.Join(";", _valueSampledDataOriginValue);
+                    return String.Join(";", _valueSampledDataOriginValue);
             }
             set
             {
@@ -435,7 +435,7 @@ namespace ServerExperiment.Models.POCO
                 if (_valueSampledDataPeriod == null)
                     return null;
                 else
-                    return string.Join(";", _valueSampledDataPeriod);
+                    return String.Join(";", _valueSampledDataPeriod);
             }
             set
             {
@@ -508,8 +508,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string ValueSampledDataDataSerialised
         {
-            get { return String.Join(";", _valueSampledDataData); }
-            set { _valueSampledDataData = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_valueSampledDataData); }
+            set { _valueSampledDataData = ModelUtils.DeserialiseString(value); }
         }
 
         private List<DateTime> _valuePeriodStart;
@@ -564,7 +564,7 @@ namespace ServerExperiment.Models.POCO
                 if (_valuePeriodEnd == null)
                     return null;
                 else
-                    return string.Join(";", _valuePeriodEnd);
+                    return String.Join(";", _valuePeriodEnd);
             }
             set
             {

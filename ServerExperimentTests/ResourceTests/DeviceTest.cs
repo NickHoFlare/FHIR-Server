@@ -6,7 +6,6 @@ using System.Web.Http.Routing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ServerExperiment.Controllers.FhirControllers;
-using ServerExperiment.Models.FHIR.Mappers;
 using ServerExperiment.Models.POCO;
 using ServerExperiment.Models.Repository;
 
@@ -39,7 +38,6 @@ namespace ServerExperimentTests.ResourceTests
             {
                 Request = request,
                 Configuration = config
-                //Configuration = new HttpConfiguration()
             };
         }
 
@@ -60,9 +58,8 @@ namespace ServerExperimentTests.ResourceTests
             mockedRepo.Setup(x => x.GetResourceByID(deviceIDs[2])).Returns(() =>null);
 
             mockedRepo.Setup(x => x.GetLatestRecord(deviceIDs[0]))
-                .Returns(new DeviceRecord() { DeviceId = deviceIDs[0], Device = new Device(1, false, deviceIDs[1]) });
-
-
+                .Returns(new DeviceRecord() { DeviceId = deviceIDs[0], Device = new Device(1, false, deviceIDs[0]) });
+        
             // ID is 1 - All OK
             var response1 = deviceController.Read(deviceIDs[0]);
             var response1A = deviceController.Read(deviceIDs[0], "application/xml+FHIR", true);
@@ -74,7 +71,6 @@ namespace ServerExperimentTests.ResourceTests
             {
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 Assert.IsNotNull(response.Content.Headers.LastModified);
-                Assert.AreEqual(typeof(StringContent), response.Content.GetType());
             }
 
             // ID is 3 - Resource Deleted
@@ -184,13 +180,42 @@ namespace ServerExperimentTests.ResourceTests
 
         /// <summary>
         /// Tests the Delete method to delete a FHIR resource.
-        /// x different outcomes:
-        /// 1) 204 No Content if resource is successfully deleted / does not exist
+        /// 3 different outcomes:
+        /// 1) 204 No Content if resource is successfully deleted
+        /// 1) 204 No Content if resource does not exist
         /// 2) 200 OK if resource has already been deleted
         /// </summary>
         [TestMethod]
         public void TestDelete()
         {
+            int[] deviceIDs = { 1, 3, 10 };
+
+            mockedRepo.Setup(x => x.GetResourceByID(deviceIDs[0])).Returns(new Device() { DeviceId = deviceIDs[0] });
+            mockedRepo.Setup(x => x.GetResourceByID(deviceIDs[1])).Returns(new Device() { DeviceId = deviceIDs[1], IsDeleted = true });
+            mockedRepo.Setup(x => x.GetResourceByID(deviceIDs[2])).Returns(() => null);
+
+            mockedRepo.Setup(x => x.GetLatestRecord(deviceIDs[0]))
+                .Returns(new DeviceRecord() { DeviceId = deviceIDs[0], Device = new Device(1, false, deviceIDs[0]) });
+
+            mockedRepo.Setup(x => x.Save()).Verifiable();
+            mockedRepo.Setup(x => x.DeleteResource(It.IsAny<Device>())).Verifiable();
+            mockedRepo.Setup(x => x.AddDeleteRecord(It.IsAny<Device>(), It.IsAny<IRecord>())).Verifiable();
+
+
+            // Case where resource is deleted
+            var response1 = deviceController.Delete(deviceIDs[0]);
+            Assert.AreEqual(HttpStatusCode.NoContent, response1.StatusCode);
+            mockedRepo.Verify(x => x.Save(), Times.Once);
+            mockedRepo.Verify(x => x.DeleteResource(It.IsAny<Device>()), Times.Once);
+            mockedRepo.Verify(x => x.AddDeleteRecord(It.IsAny<Device>(), It.IsAny<IRecord>()), Times.Once);
+
+            // Case where resource has already been deleted
+            var response2 = deviceController.Delete(deviceIDs[1]);
+            Assert.AreEqual(HttpStatusCode.OK, response2.StatusCode);
+
+            // Case where resource does not exist
+            var response3 = deviceController.Delete(deviceIDs[2]);
+            Assert.AreEqual(HttpStatusCode.NoContent, response3.StatusCode);
         }
     }
 }

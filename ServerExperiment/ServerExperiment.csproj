@@ -286,6 +286,7 @@
     <Compile Include="Models\FHIR\Mappers\PatientMapper.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\POCO\IResource.cs" />
+    <Compile Include="Models\POCO\ModelUtils.cs" />
     <Compile Include="Models\POCO\ObservationRecord.cs" />
     <Compile Include="Models\POCO\IRecord.cs" />
     <Compile Include="Models\POCO\Observation.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Castle.Core.Internal;
 using Hl7.Fhir.Model;
 using static Hl7.Fhir.Model.Observation;
 using ServerExperiment.Models.FHIR.Helpers.Observation;
@@ -64,26 +65,26 @@ namespace ServerExperiment.Models.FHIR.Mappers
             {
                 foreach (Coding coding in source.Category.Coding)
                 {
-                    if (coding.Code != null)
+                    if (!coding.Code .IsNullOrEmpty())
                         observation.CategoryCode.Add(coding.Code);
-                    if (coding.Display != null)
+                    if (!coding.Display.IsNullOrEmpty())
                         observation.CategoryDisplay.Add(coding.Display);
-                    if (coding.System != null)
+                    if (!coding.System.IsNullOrEmpty())
                         observation.CategorySystem.Add(coding.System);
                 }
                 observation.CategoryText = source.Category.Text;
             }
 
             // Observation Code
-            if (source.Category != null)
+            if (source.Code != null)
             {
                 foreach (Coding coding in source.Code.Coding)
                 {
-                    if (coding.Code != null)
+                    if (!coding.Code.IsNullOrEmpty())
                         observation.CodeCode.Add(coding.Code);
-                    if (coding.Display != null)
+                    if (!coding.Display.IsNullOrEmpty())
                         observation.CodeDisplay.Add(coding.Display);
-                    if (coding.System != null)
+                    if (!coding.System.IsNullOrEmpty())
                         observation.CodeSystem.Add(coding.System);
                 }
                 observation.CodeText = source.Code.Text;
@@ -96,7 +97,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 observation.DeviceReference = source.Device.Reference;
             foreach (var reference in source.Performer)
             {
-                if (reference.Reference != null)
+                if (!reference.Reference.IsNullOrEmpty())
                     observation.PerformerReferences.Add(reference.Reference);
             }
             
@@ -119,7 +120,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
             // Observation Interpretation
             if (source.Interpretation != null)
             {
-                if (source.Interpretation.Coding != null)
+                if (!source.Interpretation.Coding.IsNullOrEmpty())
                 {
                     observation.InterpretationCode = source.Interpretation.Coding.FirstOrDefault().Code;
                     observation.InterpretationDisplay = source.Interpretation.Coding.FirstOrDefault().Display;
@@ -129,13 +130,13 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation Comments
-            if (source.Comments != null)
+            if (!source.Comments.IsNullOrEmpty())
                 observation.Comments = source.Comments;
 
             // Site of Body where Observation was made
             if (source.BodySite != null)
             {
-                if (source.BodySite.Coding != null)
+                if (!source.BodySite.Coding.IsNullOrEmpty())
                 {
                     observation.BodySiteCode = source.BodySite.Coding.FirstOrDefault().Code;
                     observation.BodySiteDisplay = source.BodySite.Coding.FirstOrDefault().Display;
@@ -151,18 +152,18 @@ namespace ServerExperiment.Models.FHIR.Mappers
                 if (source.Value is Quantity)
                 {
                     var value = source.Value as Quantity;
-                    if (value.Code != null)
+                    if (!value.Code.IsNullOrEmpty())
                         observation.ValueQuantityCode.Add(value.Code);
-                    if (value.System != null)
+                    if (!value.System.IsNullOrEmpty())
                         observation.ValueQuantitySystem.Add(value.System);
-                    if (value.Unit != null)
+                    if (!value.Unit.IsNullOrEmpty())
                         observation.ValueQuantityUnit.Add(value.Unit);
                     observation.ValueQuantityValue.Add((decimal)value.Value);
                 }
                 else if (source.Value is CodeableConcept)
                 {
                     var value = source.Value as CodeableConcept;
-                    if (value.Coding != null)
+                    if (!value.Coding.IsNullOrEmpty())
                     {
                         observation.ValueSystem.Add(value.Coding.FirstOrDefault().System);
                         observation.ValueCode.Add(value.Coding.FirstOrDefault().Code);
@@ -292,12 +293,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation Category
-            if (observation.CategoryCode[0] != string.Empty || observation.CategoryDisplay[0] != string.Empty || observation.CategorySystem[0] != string.Empty || observation.CategoryText != null)
+            if (!observation.CategoryCode.IsNullOrEmpty() || observation.CategoryDisplay.IsNullOrEmpty() || observation.CategorySystem.IsNullOrEmpty() || !observation.CategoryText.IsNullOrEmpty())
             {
                 CodeableConcept observationCategory = new CodeableConcept();
                 List<Coding> observationCodings = new List<Coding>();
 
-                if (observation.CategoryCode[0] != string.Empty || observation.CategoryDisplay[0] != string.Empty || observation.CategorySystem[0] != string.Empty)
+                if (!observation.CategoryCode.IsNullOrEmpty() || observation.CategoryDisplay.IsNullOrEmpty() || observation.CategorySystem.IsNullOrEmpty())
                 {
                     for (int i = 0; i < observation.CategoryCode.Count ; i++)
                     {
@@ -317,12 +318,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation Code
-            if (observation.CodeCode[0] != string.Empty || observation.CodeDisplay[0] != string.Empty || observation.CodeSystem[0] != string.Empty || observation.CodeText != null)
+            if (observation.CodeCode.IsNullOrEmpty() || observation.CodeDisplay.IsNullOrEmpty() || observation.CodeSystem.IsNullOrEmpty() || !observation.CodeText.IsNullOrEmpty())
             {
                 CodeableConcept observationCode = new CodeableConcept();
                 List<Coding> observationCodings = new List<Coding>();
 
-                if (observation.CodeCode[0] != string.Empty || observation.CodeDisplay[0] != string.Empty || observation.CodeSystem[0] != string.Empty)
+                if (observation.CodeCode.IsNullOrEmpty() || observation.CodeDisplay.IsNullOrEmpty() || observation.CodeSystem.IsNullOrEmpty())
                 {
                     for (int i = 0; i < observation.CodeCode.Count; i++)
                     {
@@ -342,18 +343,18 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation references to other resources
-            if (observation.PatientReference != null)
+            if (!observation.PatientReference.IsNullOrEmpty())
             {
                 resource.Subject = new ResourceReference();
                 resource.Subject.Reference = observation.PatientReference;
             }
-            if (observation.DeviceReference != null)
+            if (!observation.DeviceReference.IsNullOrEmpty())
             {
                 resource.Device = new ResourceReference();
                 resource.Device.Reference = observation.DeviceReference;
             }
 
-            if (observation.PerformerReferences[0] != string.Empty)
+            if (!observation.PerformerReferences.IsNullOrEmpty())
             {
                 foreach (var reference in observation.PerformerReferences)
                 {
@@ -387,12 +388,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
             resource.Comments = observation.Comments;
 
             // Site of Body where Observation was made
-            if (observation.BodySiteCode != null || observation.BodySiteDisplay != null || observation.BodySiteSystem != null || observation.BodySiteText != null)
+            if (!observation.BodySiteCode.IsNullOrEmpty() || !observation.BodySiteDisplay.IsNullOrEmpty() || !observation.BodySiteSystem.IsNullOrEmpty() || !observation.BodySiteText.IsNullOrEmpty())
             {
                 CodeableConcept observationBodySite = new CodeableConcept();
                 List<Coding> observationCodings = new List<Coding>();
 
-                if (observation.BodySiteCode != null || observation.BodySiteDisplay != null || observation.BodySiteSystem != null)
+                if (!observation.BodySiteCode.IsNullOrEmpty() || !observation.BodySiteDisplay.IsNullOrEmpty() || !observation.BodySiteSystem.IsNullOrEmpty())
                 {
                     Coding observationCoding = new Coding()
                     {
@@ -409,12 +410,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation Interpretation
-            if (observation.InterpretationCode != null || observation.InterpretationDisplay != null || observation.InterpretationSystem != null || observation.InterpretationText != null)
+            if (!observation.InterpretationCode.IsNullOrEmpty() || !observation.InterpretationDisplay.IsNullOrEmpty() || !observation.InterpretationSystem.IsNullOrEmpty() || !observation.InterpretationText.IsNullOrEmpty())
             {
                 CodeableConcept observationInterpretation = new CodeableConcept();
                 List<Coding> observationCodings = new List<Coding>();
 
-                if (observation.InterpretationCode != null || observation.InterpretationDisplay != null || observation.InterpretationSystem != null)
+                if (!observation.InterpretationCode.IsNullOrEmpty() || !observation.InterpretationDisplay.IsNullOrEmpty() || !observation.InterpretationSystem.IsNullOrEmpty())
                 {
                     Coding observationCoding = new Coding()
                     {
@@ -432,7 +433,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
             // Observation Values
             // Values are componentised
-            if (observation.ComponentCodeCode[0] != string.Empty || observation.ComponentCodeText != null) 
+            if (!observation.ComponentCodeCode.IsNullOrEmpty() || !observation.ComponentCodeText.IsNullOrEmpty())
             {
                 for (int i = 0; i < observation.ComponentCodeCode.Count; i++)
                 {
@@ -451,7 +452,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     resource.Component.Add(component);
 
                     // value is of Type Quantity
-                    if (observation.ValueQuantityValue != null)
+                    if (!observation.ValueQuantityValue.IsNullOrEmpty())
                     {
                         Quantity quantity = new Quantity
                         {
@@ -464,7 +465,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                         resource.Component[i].Value = quantity;
                     }
                     // value is of Type CodeableConcept
-                    else if (observation.ValueCode[0] != string.Empty)
+                    else if (!observation.ValueCode.IsNullOrEmpty())
                     {
                         concept = new CodeableConcept();
                         coding = new Coding
@@ -479,7 +480,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                         resource.Component[i].Value = concept;
                     }
                     // value is of Type String
-                    else if (observation.ValueString[0] != string.Empty)
+                    else if (!observation.ValueString.IsNullOrEmpty())
                     {
                         FhirString fhirString = new FhirString();
                         fhirString.Value = observation.ValueString[i];
@@ -487,7 +488,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                         resource.Component[i].Value = fhirString;
                     }
                     // value is of Type SampledData
-                    else if (observation.ValueSampledDataOriginValue != null)
+                    else if (!observation.ValueSampledDataOriginValue.IsNullOrEmpty())
                     {
                         SimpleQuantity quantity = new SimpleQuantity
                         {
@@ -508,7 +509,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                         resource.Component[i].Value = sampleData;
                     }
                     // value is of Type Period 
-                    else if (observation.ValuePeriodStart != null)
+                    else if (!observation.ValuePeriodStart.IsNullOrEmpty())
                     {
                         Period period = new Period
                         {
@@ -529,35 +530,36 @@ namespace ServerExperiment.Models.FHIR.Mappers
             else
             {
                 // value is of Type Quantity
-                if (observation.ValueQuantityValue != null)
+                if (!observation.ValueQuantityValue.IsNullOrEmpty())
                 {
-                    Quantity quantity = new Quantity
-                    {
-                        Code = observation.ValueQuantityCode[0],
-                        System = observation.ValueQuantitySystem[0],
-                        Unit = observation.ValueQuantityUnit[0],
-                        Value = observation.ValueQuantityValue[0]
-                    };
+                    Quantity quantity = new Quantity();
+                    if (!observation.ValueQuantityCode.IsNullOrEmpty())
+                        quantity.Code = observation.ValueQuantityCode[0];
+                    if (!observation.ValueQuantitySystem.IsNullOrEmpty())
+                        quantity.System = observation.ValueQuantitySystem[0];
+                    if (!observation.ValueQuantityUnit.IsNullOrEmpty())
+                        quantity.Unit = observation.ValueQuantityUnit[0];
+                    quantity.Value = observation.ValueQuantityValue[0];
 
                     resource.Value = quantity;
                 }
                 // value is of Type CodeableConcept
-                else if (observation.ValueCode[0] != string.Empty)
+                else if (!observation.ValueCode.IsNullOrEmpty())
                 {
                     CodeableConcept concept = new CodeableConcept();
-                    Coding coding = new Coding
-                    {
-                        Code = observation.ValueCode[0],
-                        Display = observation.ValueDisplay[0],
-                        System = observation.ValueSystem[0]
-                    };
-
+                    Coding coding = new Coding();
+                    if (!observation.ValueQuantityCode.IsNullOrEmpty())
+                        coding.Code = observation.ValueCode[0];
+                    if (!observation.ValueQuantityCode.IsNullOrEmpty())
+                        coding.Display = observation.ValueDisplay[0];
+                    if (!observation.ValueQuantityCode.IsNullOrEmpty())
+                        coding.System = observation.ValueSystem[0];
                     concept.Coding.Add(coding);
                     concept.Text = observation.ValueText[0];
                     resource.Value = concept;
                 }
                 // value is of Type String
-                else if (observation.ValueString[0] != string.Empty)
+                else if (!observation.ValueString.IsNullOrEmpty())
                 {
                     FhirString fhirString = new FhirString();
                     fhirString.Value = observation.ValueString[0];
@@ -565,28 +567,30 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     resource.Value = fhirString;
                 }
                 // value is of Type SampledData
-                else if (observation.ValueSampledDataOriginValue != null)
+                else if (!observation.ValueSampledDataOriginValue.IsNullOrEmpty())
                 {
-                    SimpleQuantity quantity = new SimpleQuantity
-                    {
-                        Code = observation.ValueSampledDataOriginCode[0],
-                        System = observation.ValueSampledDataOriginSystem[0],
-                        Unit = observation.ValueSampledDataOriginUnit[0],
-                        Value = observation.ValueSampledDataOriginValue[0]
-                    };
+                    SimpleQuantity quantity = new SimpleQuantity();
+                    if (!observation.ValueSampledDataOriginCode.IsNullOrEmpty())
+                        quantity.Code = observation.ValueSampledDataOriginCode[0];
+                    if (!observation.ValueSampledDataOriginSystem.IsNullOrEmpty())
+                        quantity.System = observation.ValueSampledDataOriginSystem[0];
+                    if (!observation.ValueSampledDataOriginUnit.IsNullOrEmpty())
+                        quantity.Unit = observation.ValueSampledDataOriginUnit[0];
+                    quantity.Value = observation.ValueSampledDataOriginValue[0];
 
-                    SampledData sampleData = new SampledData
-                    {
-                        Origin = quantity,
-                        Data = observation.ValueSampledDataData[0],
-                        Dimensions = observation.ValueSampledDataDimensions[0],
-                        Period = observation.ValueSampledDataPeriod[0]
-                    };
+                    SampledData sampleData = new SampledData();
+                    sampleData.Origin = quantity;
+                    if (!observation.ValueSampledDataData.IsNullOrEmpty())
+                        sampleData.Data = observation.ValueSampledDataData[0];
+                    if (!observation.ValueSampledDataDimensions.IsNullOrEmpty())
+                        sampleData.Dimensions = observation.ValueSampledDataDimensions[0];
+                    if (!observation.ValueSampledDataPeriod.IsNullOrEmpty())
+                        sampleData.Period = observation.ValueSampledDataPeriod[0];
 
                     resource.Value = sampleData;
                 }
                 // value is of Type Period 
-                else if (observation.ValuePeriodStart != null)
+                else if (!observation.ValuePeriodStart .IsNullOrEmpty())
                 {
                     Period period = new Period
                     {

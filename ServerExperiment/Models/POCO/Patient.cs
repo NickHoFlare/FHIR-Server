@@ -49,8 +49,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string FirstNamesSerialised
         {
-            get { return String.Join(";", _firstNames); }
-            set { _firstNames = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_firstNames); }
+            set { _firstNames = ModelUtils.DeserialiseString(value); }
         }
 
         private List<string> _lastNames;
@@ -61,8 +61,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string LastNamesSerialised
         {
-            get { return String.Join(";", _lastNames); }
-            set { _lastNames = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_lastNames); }
+            set { _lastNames = ModelUtils.DeserialiseString(value); }
         }
 
         // Patient Address
@@ -74,8 +74,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string AddressLines1Serialised
         {
-            get { return String.Join(";", _addressLines1); }
-            set { _addressLines1 = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_addressLines1); }
+            set { _addressLines1 = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _addressLines2;
         public List<string> AddressLines2
@@ -85,8 +85,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string AddressLines2Serialised
         {
-            get { return String.Join(";", _addressLines2); }
-            set { _addressLines2 = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_addressLines2); }
+            set { _addressLines2 = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _postalCodes;
         public List<string> PostalCodes
@@ -96,8 +96,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string PostalCodesSerialised
         {
-            get { return String.Join(";", _postalCodes); }
-            set { _postalCodes = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_postalCodes); }
+            set { _postalCodes = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _cities;
         public List<string> Cities
@@ -107,8 +107,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CitiesSerialised
         {
-            get { return String.Join(";", _cities); }
-            set { _cities = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_cities); }
+            set { _cities = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _countries;
         public List<string> Countries
@@ -118,8 +118,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string CountriesSerialised
         {
-            get { return String.Join(";", _countries); }
-            set { _countries = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_countries); }
+            set { _countries = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _states;
         public List<string> States
@@ -129,8 +129,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string StatesSerialised
         {
-            get { return String.Join(";", _states); }
-            set { _states = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_states); }
+            set { _states = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _periodStarts;
         public List<string> PeriodStarts
@@ -140,8 +140,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string PeriodStartsSerialised
         {
-            get { return String.Join(";", _periodStarts); }
-            set { _periodStarts = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_periodStarts); }
+            set { _periodStarts = ModelUtils.DeserialiseString(value); }
         }
         private List<string> _periodEnds;
         public List<string> PeriodEnds
@@ -151,8 +151,8 @@ namespace ServerExperiment.Models.POCO
         }
         public string PeriodEndsSerialised
         {
-            get { return String.Join(";", _periodEnds); }
-            set { _periodEnds = value.Split(';').ToList(); }
+            get { return ModelUtils.ReturnSerialisedString(_periodEnds); }
+            set { _periodEnds = ModelUtils.DeserialiseString(value); }
         }
 
         // Patient Birthday/Gender

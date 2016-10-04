@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Castle.Core.Internal;
 using Hl7.Fhir.Model;
 using ServerExperiment.Models.FHIR.Helpers.Patient;
 
@@ -231,9 +232,9 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             // Patient Telecom
             List<ContactPoint> contactPoints= new List<ContactPoint>();
 
-            if (patient.Phone != null)
+            if (!patient.Phone.IsNullOrEmpty())
             {
-                var phone = new ContactPoint()
+                var phone = new ContactPoint
                 {
                     Value = patient.Phone,
                     System = ContactPoint.ContactPointSystem.Phone,
@@ -241,9 +242,9 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                 };
                 contactPoints.Add(phone);
             }
-            if (patient.Mobile != null)
+            if (!patient.Mobile.IsNullOrEmpty())
             {
-                var mobile = new ContactPoint()
+                var mobile = new ContactPoint
                 {
                     Value = patient.Mobile,
                     System = ContactPoint.ContactPointSystem.Phone,
@@ -251,7 +252,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                 };
                 contactPoints.Add(mobile);
             }
-            if (patient.Email != null)
+            if (!patient.Email.IsNullOrEmpty())
             {
                 var email = new ContactPoint()
                 {
@@ -262,7 +263,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                 contactPoints.Add(email);
             }
 
-            if (patient.Phone != null || patient.Mobile != null || patient.Email != null)
+            if (!patient.Phone.IsNullOrEmpty() || !patient.Mobile.IsNullOrEmpty() || !patient.Email.IsNullOrEmpty())
             {
                 resource.Telecom = contactPoints;
             }
@@ -270,7 +271,7 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             // Patient Address
             List<Address> fhirAddresses = null;
 
-            if (patient.AddressLines1 != null && patient.AddressLines1[0] != string.Empty)
+            if (!patient.AddressLines1.IsNullOrEmpty())
             {
                 fhirAddresses = new List<Address>();
 
@@ -282,17 +283,17 @@ namespace ServerExperiment.POCO.FHIR.Mappers
                         City = patient.Cities[j],
                         State = patient.States[j],
                         PostalCode = patient.PostalCodes[j],
-                        Line = new[]
-                        {
-                        patient.AddressLines1[j],
-                        patient.AddressLines2[j],
-                    },
-                        Period = new Period
-                        {
-                            Start = patient.PeriodStarts[j],
-                            End = patient.PeriodEnds[j],
-                        }
+                        Line = new[] {patient.AddressLines1[j], patient.AddressLines2[j]}
                     };
+                    if (!patient.PeriodStarts.IsNullOrEmpty() || !patient.PeriodEnds.IsNullOrEmpty())
+                    {
+                        Period period = new Period();
+                        if (!patient.PeriodStarts.IsNullOrEmpty())
+                            period.Start = patient.PeriodStarts[j];
+                        if (!patient.PeriodEnds.IsNullOrEmpty())
+                            period.End = patient.PeriodEnds[j];
+                    }
+
 
                     fhirAddresses.Add(fhirAddress);
                 }
