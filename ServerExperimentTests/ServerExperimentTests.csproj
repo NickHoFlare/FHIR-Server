@@ -84,7 +84,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="MockedRepositories\DeviceRepository.cs" />
     <Compile Include="ResourceTests\PatientTest.cs" />
     <Compile Include="ResourceTests\DeviceTest.cs" />
     <Compile Include="ResourceTests\ObservationTest.cs" />
