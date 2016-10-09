@@ -47,6 +47,7 @@ C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerE
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\Castle.Core.xml
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\EntityFramework.xml
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\Hl7.Fhir.DSTU2.Core.pdb
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\Hl7.Fhir.DSTU2.Core.xml
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\Moq.xml
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\Newtonsoft.Json.xml
@@ -73,4 +74,3 @@ C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerE
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\obj\Debug\ServerExperimentTests.csprojResolveAssemblyReference.cache
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\obj\Debug\ServerExperimentTests.dll
 C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\obj\Debug\ServerExperimentTests.pdb
-C:\Users\nicho\Dropbox\Computing\Thesis\Implementations\ServerExperiment\ServerExperimentTests\bin\Debug\Hl7.Fhir.DSTU2.Core.pdb

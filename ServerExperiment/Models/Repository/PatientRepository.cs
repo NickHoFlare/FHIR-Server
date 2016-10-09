@@ -3,6 +3,9 @@ using ServerExperiment.Models.POCO;
 using System;
 using System.Data.Entity;
 using System.Linq;
+using Hl7.Fhir.Model;
+using Observation = ServerExperiment.Models.POCO.Observation;
+using Patient = ServerExperiment.Models.POCO.Patient;
 
 namespace ServerExperiment.Models.Repository
 {
@@ -46,7 +49,7 @@ namespace ServerExperiment.Models.Repository
                                     .First();
         }
 
-        public void AddCreateRecord(IResource patient)
+        public IRecord AddCreateRecord(IResource patient)
         {
             var patientRecord = new PatientRecord();
 
@@ -54,22 +57,42 @@ namespace ServerExperiment.Models.Repository
             patientRecord.Patient = (Patient)patient;
 
             db.PatientRecords.Add(patientRecord);
+
+            return patientRecord;
         }
 
-        public void AddUpdateRecord(IResource patient, IRecord record)
+        public IRecord AddUpdateRecord(IResource patient, IRecord record)
         {
             var patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
             patientRecord.Patient = (Patient)patient;
 
             db.PatientRecords.Add(patientRecord);
+
+            return patientRecord;
         }
 
-        public void AddDeleteRecord(IResource patient, IRecord record)
+        public IRecord AddDeleteRecord(IResource patient, IRecord record)
         {
             var patientRecord = (PatientRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
             patientRecord.Patient = (Patient)patient;
 
             db.PatientRecords.Add(patientRecord);
+
+            return patientRecord;
+        }
+
+        public Resource AddMetadata(IResource resource, Resource fhirPatient, IRecord record)
+        {
+            Patient patient = (Patient)resource;
+            fhirPatient.Id = patient.PatientId.ToString();
+            fhirPatient.Meta = new Meta
+            {
+                ElementId = patient.PatientId.ToString(),
+                VersionId = record.VersionId.ToString(),
+                LastUpdated = record.LastModified
+            };
+
+            return fhirPatient;
         }
 
         public void Save()

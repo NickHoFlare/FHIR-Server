@@ -3,6 +3,8 @@ using ServerExperiment.Models.POCO;
 using System;
 using System.Data.Entity;
 using System.Linq;
+using Hl7.Fhir.Model;
+using Observation = ServerExperiment.Models.POCO.Observation;
 
 namespace ServerExperiment.Models.Repository
 {
@@ -24,6 +26,9 @@ namespace ServerExperiment.Models.Repository
 
         public void UpdateResource(IResource observation)
         {
+            // If a resources is "deleted" yet we update it, we effectively "undelete" it.
+            observation.IsDeleted = false;
+
             _db.Entry(observation).State = EntityState.Modified;
         }
 
@@ -46,7 +51,7 @@ namespace ServerExperiment.Models.Repository
                                     .First();
         }
 
-        public void AddCreateRecord(IResource observation)
+        public IRecord AddCreateRecord(IResource observation)
         {
             var observationRecord = new ObservationRecord();
 
@@ -54,22 +59,42 @@ namespace ServerExperiment.Models.Repository
             observationRecord.Observation = (Observation)observation;
 
             _db.ObservationRecords.Add(observationRecord);
+
+            return observationRecord;
         }
 
-        public void AddUpdateRecord(IResource observation, IRecord record)
+        public IRecord AddUpdateRecord(IResource observation, IRecord record)
         {
             var observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
             observationRecord.Observation = (Observation)observation;
 
             _db.ObservationRecords.Add(observationRecord);
+
+            return observationRecord;
         }
 
-        public void AddDeleteRecord(IResource observation, IRecord record)
+        public IRecord AddDeleteRecord(IResource observation, IRecord record)
         {
             var observationRecord = (ObservationRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
             observationRecord.Observation = (Observation)observation;
 
             _db.ObservationRecords.Add(observationRecord);
+
+            return observationRecord;
+        }
+
+        public Resource AddMetadata(IResource resource, Resource fhirObservation, IRecord record)
+        {
+            Observation observation = (Observation)resource;
+            fhirObservation.Id = observation.ObservationId.ToString();
+            fhirObservation.Meta = new Meta
+            {
+                ElementId = observation.ObservationId.ToString(),
+                VersionId = record.VersionId.ToString(),
+                LastUpdated = record.LastModified
+            };
+
+            return fhirObservation;
         }
 
         public void Save()

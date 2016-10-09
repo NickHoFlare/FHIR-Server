@@ -1,6 +1,8 @@
 ﻿using Hl7.Fhir.Serialization;
 using ServerExperiment.Models.POCO;
 using System;
+using System.Net.Http.Formatting;
+using ServerExperiment.Utils;
 
 namespace ServerExperiment.Controllers.FhirControllers
 {
@@ -62,6 +64,24 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             return updatedRecord;
+        }
+
+        public static MediaTypeFormatter ChooseMediaTypeFormatter(string format)
+        {
+            // Determine MediaTypeFormatter to use
+            string fixedFormat = ControllerUtils.FixMimeString(format);
+
+            MediaTypeFormatter formatter = null;
+            if (fixedFormat.Equals("application/json+fhir", StringComparison.CurrentCultureIgnoreCase))
+            {
+                formatter = new JsonFhirFormatter();
+            }
+            else
+            {
+                formatter = new XmlFhirFormatter();
+            }
+
+            return formatter;
         }
     }
 }

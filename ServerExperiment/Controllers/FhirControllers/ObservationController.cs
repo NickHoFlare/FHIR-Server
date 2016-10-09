@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
@@ -64,11 +65,12 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Observation/{observationId}")]
         [HttpPut]
         [RequireHttps]
-        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int observationId, bool test = false)
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int observationId, string _format = "application/xml+FHIR", bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
             Hl7.Fhir.Model.Observation fhirObservation = null;
+            // Check that input resource is of type Observation
             try
             {
                 fhirObservation = (Hl7.Fhir.Model.Observation)resource;
@@ -79,13 +81,14 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.StatusCode = HttpStatusCode.NotFound;
                 return message;
             }
-
+            // Check that input resource has a logical ID
             if (fhirObservation.Id == null)
             {
                 message.Content = new StringContent("Observation to be updated should have a logical ID!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.BadRequest;
                 return message;
             }
+            // Check that URL resource ID == input resource logical ID
             if (observationId != int.Parse(fhirObservation.Id))
             {
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -94,31 +97,40 @@ namespace ServerExperiment.Controllers.FhirControllers
             }
 
             Observation observation = ObservationMapper.MapResource(fhirObservation);
+
+            // Determine MediaTypeFormatter to use
+            MediaTypeFormatter formatter = ControllerUtils.ChooseMediaTypeFormatter(_format);
+
             if (ObservationExists(observationId))
             {
                 ObservationRecord record = (ObservationRecord)observationRepository.GetLatestRecord(observationId);
-
+                record = (ObservationRecord)observationRepository.AddUpdateRecord(observation, record);
                 observationRepository.UpdateResource(observation);
-                observationRepository.AddUpdateRecord(observation, record);
 
                 observationRepository.Save(); // Look out for DbUpdateConcurrencyException
+                
+                // Save metadata
+                fhirObservation = (Hl7.Fhir.Model.Observation)observationRepository.AddMetadata(observation, fhirObservation, record);
 
                 message.StatusCode = HttpStatusCode.OK;
-                message.Content = new StringContent("Observation with id " + observationId + " has been modified!", Encoding.UTF8, "text/html");
+                message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Observation), fhirObservation, formatter);
             }
             else
             {
                 observationRepository.AddResource(observation);
                 observationRepository.Save();
 
-                observationRepository.AddCreateRecord(observation);
+                ObservationRecord record = (ObservationRecord)observationRepository.AddCreateRecord(observation);
                 observationRepository.Save();
+
+                // Save metadata
+                fhirObservation = (Hl7.Fhir.Model.Observation)observationRepository.AddMetadata(observation, fhirObservation, record);
 
                 // For testing purposes only.
                 if (test)
                     observation.ObservationId = 7357;
 
-                message.Content = new StringContent("Observation created with ID " + observation.ObservationId + "!", Encoding.UTF8, "text/html");
+                message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Observation), fhirObservation, formatter);
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificObservation", new { id = observation.ObservationId }));
             }
@@ -130,7 +142,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Observation")]
         [HttpPost]
         [RequireHttps]
-        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, bool test = false)
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, string _format = "application/xml+FHIR", bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
@@ -157,14 +169,20 @@ namespace ServerExperiment.Controllers.FhirControllers
             observationRepository.AddResource(observation);
             observationRepository.Save();
 
-            observationRepository.AddCreateRecord(observation);
+            ObservationRecord record = (ObservationRecord)observationRepository.AddCreateRecord(observation);
             observationRepository.Save();
 
             // For testing purposes only.
             if (test && observation.ObservationId == 0)
                 observation.ObservationId = 7357;
 
-            message.Content = new StringContent("Observation created with ID " + observation.ObservationId + "!", Encoding.UTF8, "text/html");
+            // Save metadata
+            fhirObservation = (Hl7.Fhir.Model.Observation)observationRepository.AddMetadata(observation, fhirObservation, record);
+
+            // Determine MediaTypeFormatter to use
+            MediaTypeFormatter formatter = ControllerUtils.ChooseMediaTypeFormatter(_format);
+
+            message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Observation), fhirObservation, formatter);
             message.StatusCode = HttpStatusCode.Created;
             message.Headers.Location = new Uri(Url.Link("SpecificObservation", new { id = observation.ObservationId }));
 

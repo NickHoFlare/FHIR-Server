@@ -277,14 +277,20 @@ namespace ServerExperiment.POCO.FHIR.Mappers
 
                 for (int j = 0; j < patient.AddressLines1.Count; j++)
                 {
-                    Address fhirAddress = new Address()
-                    {
-                        Country = patient.Countries[j],
-                        City = patient.Cities[j],
-                        State = patient.States[j],
-                        PostalCode = patient.PostalCodes[j],
-                        Line = new[] {patient.AddressLines1[j], patient.AddressLines2[j]}
-                    };
+                    Address fhirAddress = new Address();
+                    if (!patient.Countries.IsNullOrEmpty())
+                        fhirAddress.Country = patient.Countries[j];
+                    if (!patient.Cities.IsNullOrEmpty())
+                        fhirAddress.City = patient.Cities[j];
+                    if (!patient.States.IsNullOrEmpty())
+                        fhirAddress.State = patient.States[j];
+                    if (!patient.PostalCodes.IsNullOrEmpty())
+                        fhirAddress.PostalCode = patient.PostalCodes[j];
+                    var addressLines = new List<string> {patient.AddressLines1[j]};
+                    if (!patient.AddressLines2.IsNullOrEmpty())
+                        addressLines.Add(patient.AddressLines2[j]);
+                    fhirAddress.Line = addressLines;
+
                     if (!patient.PeriodStarts.IsNullOrEmpty() || !patient.PeriodEnds.IsNullOrEmpty())
                     {
                         Period period = new Period();

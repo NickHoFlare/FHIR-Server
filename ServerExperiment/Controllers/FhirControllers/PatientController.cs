@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Text;
 using ServerExperiment.Controllers.FhirControllers;
@@ -65,11 +66,12 @@ namespace ServerExperiment.Controllers
         [Route("fhir/Patient/{patientId}")]
         [HttpPut]
         [RequireHttps]
-        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int patientId, bool test = false)
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int patientId, string _format = "application/xml+FHIR", bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
             Hl7.Fhir.Model.Patient fhirPatient = null;
+            // Check that input resource is of type Patient
             try
             {
                 fhirPatient = (Hl7.Fhir.Model.Patient)resource;
@@ -80,13 +82,14 @@ namespace ServerExperiment.Controllers
                 message.StatusCode = HttpStatusCode.NotFound;
                 return message;
             }
-
+            // Check that input resource has a logical ID
             if (fhirPatient.Id == null)
             {
                 message.Content = new StringContent("Patient to be updated should have a logical ID!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.BadRequest;
                 return message;
             }
+            // Check that URL resource ID == input resource logical ID
             if (patientId != int.Parse(fhirPatient.Id))
             {
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -95,6 +98,9 @@ namespace ServerExperiment.Controllers
             }
 
             Patient patient = PatientMapper.MapResource(fhirPatient);
+
+            // Determine MediaTypeFormatter to use
+            MediaTypeFormatter formatter = ControllerUtils.ChooseMediaTypeFormatter(_format);
 
             if (PatientExists(patientId))
             {
@@ -105,22 +111,28 @@ namespace ServerExperiment.Controllers
 
                 patientRepository.Save(); // Look out for DbUpdateConcurrencyException
 
+                // Save metadata
+                fhirPatient = (Hl7.Fhir.Model.Patient)patientRepository.AddMetadata(patient, fhirPatient, record);
+
                 message.StatusCode = HttpStatusCode.OK;
-                message.Content = new StringContent("Patient with id " + patientId + " has been modified!", Encoding.UTF8, "text/html");
+                message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Patient), fhirPatient, formatter);
             }
             else
             {
                 patientRepository.AddResource(patient);
                 patientRepository.Save();
 
-                patientRepository.AddCreateRecord(patient);
+                PatientRecord record = (PatientRecord)patientRepository.AddCreateRecord(patient);
                 patientRepository.Save();
+
+                // Save metadata
+                fhirPatient = (Hl7.Fhir.Model.Patient)patientRepository.AddMetadata(patient, fhirPatient, record);
 
                 // For testing purposes only.
                 if (test)
                     patient.PatientId = 7357;
 
-                message.Content = new StringContent("Patient created with ID " + patient.PatientId + "!", Encoding.UTF8, "text/html");
+                message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Patient), fhirPatient, formatter);
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificPatient", new { id = patient.PatientId }));
             }
@@ -132,7 +144,7 @@ namespace ServerExperiment.Controllers
         [Route("fhir/Patient")]
         [HttpPost]
         [RequireHttps]
-        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, bool test = false)
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, string _format = "application/xml+FHIR", bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
 
@@ -159,14 +171,20 @@ namespace ServerExperiment.Controllers
             patientRepository.AddResource(patient);
             patientRepository.Save();
 
-            patientRepository.AddCreateRecord(patient);
+            PatientRecord record = (PatientRecord)patientRepository.AddCreateRecord(patient);
             patientRepository.Save();
 
             // For testing purposes only.
             if (test && patient.PatientId == 0)
                 patient.PatientId = 7357;
 
-            message.Content = new StringContent("Patient created with ID " + patient.PatientId + "!", Encoding.UTF8, "text/html");
+            // Save metadata
+            fhirPatient = (Hl7.Fhir.Model.Patient)patientRepository.AddMetadata(patient, fhirPatient, record);
+
+            // Determine MediaTypeFormatter to use
+            MediaTypeFormatter formatter = ControllerUtils.ChooseMediaTypeFormatter(_format);
+
+            message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Patient), fhirPatient, formatter);
             message.StatusCode = HttpStatusCode.Created;
             message.Headers.Location = new Uri(Url.Link("SpecificPatient", new { id = patient.PatientId }));
 

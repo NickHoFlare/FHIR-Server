@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Text;
 using ServerExperiment.Models.FHIR.Mappers;
@@ -64,10 +65,11 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Device/{deviceId}")]
         [HttpPut]
         [RequireHttps]
-        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int deviceId, bool test = false)
+        public HttpResponseMessage Update(Hl7.Fhir.Model.Resource resource, int deviceId, string _format = "application/xml+FHIR", bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
             Hl7.Fhir.Model.Device fhirDevice = null;
+            // Check that input resource is of type Device
             try
             {
                 fhirDevice = (Hl7.Fhir.Model.Device)resource;
@@ -78,13 +80,14 @@ namespace ServerExperiment.Controllers.FhirControllers
                 message.StatusCode = HttpStatusCode.NotFound;
                 return message;
             }
-
+            // Check that input resource has a logical ID
             if (fhirDevice.Id == null)
             {
                 message.Content = new StringContent("Device to be updated should have a logical ID!", Encoding.UTF8, "text/html");
                 message.StatusCode = HttpStatusCode.BadRequest;
                 return message;
             }
+            // Check that URL resource ID == input resource logical ID
             if (deviceId != int.Parse(fhirDevice.Id))
             {
                 message.StatusCode = HttpStatusCode.BadRequest;
@@ -94,31 +97,39 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             Device device = DeviceMapper.MapResource(fhirDevice);
 
+            // Determine MediaTypeFormatter to use
+            MediaTypeFormatter formatter = ControllerUtils.ChooseMediaTypeFormatter(_format);
+
             if (DeviceExists(deviceId))
             {
                 DeviceRecord record = (DeviceRecord)deviceRepository.GetLatestRecord(deviceId);
-
+                record = (DeviceRecord)deviceRepository.AddUpdateRecord(device, record);
                 deviceRepository.UpdateResource(device);
-                deviceRepository.AddUpdateRecord(device, record);
 
                 deviceRepository.Save();
 
+                // Save metadata
+                fhirDevice = (Hl7.Fhir.Model.Device)deviceRepository.AddMetadata(device, fhirDevice, record);
+
                 message.StatusCode = HttpStatusCode.OK;
-                message.Content = new StringContent("Device with id " + deviceId + " has been modified!", Encoding.UTF8, "text/html");
+                message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Device), fhirDevice, formatter);
             }
             else
             {
                 deviceRepository.AddResource(device);
                 deviceRepository.Save();
 
-                deviceRepository.AddCreateRecord(device);
+                DeviceRecord record = (DeviceRecord)deviceRepository.AddCreateRecord(device);
                 deviceRepository.Save();
+
+                // Save metadata
+                fhirDevice = (Hl7.Fhir.Model.Device)deviceRepository.AddMetadata(device, fhirDevice, record);
 
                 // For testing purposes only.
                 if (test)
                     device.DeviceId = 7357;
 
-                message.Content = new StringContent("Device created with ID " + device.DeviceId + "!", Encoding.UTF8, "text/html");
+                message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Device), fhirDevice, formatter);
                 message.StatusCode = HttpStatusCode.Created;
                 message.Headers.Location = new Uri(Url.Link("SpecificDevice", new { id = device.DeviceId }));
             }
@@ -130,9 +141,10 @@ namespace ServerExperiment.Controllers.FhirControllers
         [Route("fhir/Device")]
         [HttpPost]
         [RequireHttps]
-        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, bool test = false)
+        public HttpResponseMessage Create(Hl7.Fhir.Model.Resource resource, string _format = "application/xml+FHIR", bool test = false)
         {
             HttpResponseMessage message = new HttpResponseMessage();
+
             Hl7.Fhir.Model.Device fhirDevice = null;
             try
             {
@@ -156,14 +168,20 @@ namespace ServerExperiment.Controllers.FhirControllers
             deviceRepository.AddResource(device);
             deviceRepository.Save();
 
-            deviceRepository.AddCreateRecord(device);
+            DeviceRecord record = (DeviceRecord)deviceRepository.AddCreateRecord(device);
             deviceRepository.Save();
 
             // For testing purposes only.
             if (test && device.DeviceId == 0)
                 device.DeviceId = 7357;
 
-            message.Content = new StringContent("Device created with ID " + device.DeviceId + "!", Encoding.UTF8, "text/html");
+            // Save metadata
+            fhirDevice = (Hl7.Fhir.Model.Device)deviceRepository.AddMetadata(device, fhirDevice, record);
+
+            // Determine MediaTypeFormatter to use
+            MediaTypeFormatter formatter = ControllerUtils.ChooseMediaTypeFormatter(_format);
+
+            message.Content = new ObjectContent(typeof(Hl7.Fhir.Model.Device), fhirDevice, formatter);
             message.StatusCode = HttpStatusCode.Created;
             message.Headers.Location = new Uri(Url.Link("SpecificDevice", new { id = device.DeviceId }));
 

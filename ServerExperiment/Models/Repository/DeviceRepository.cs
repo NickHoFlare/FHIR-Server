@@ -3,6 +3,8 @@ using ServerExperiment.Models.POCO;
 using System;
 using System.Data.Entity;
 using System.Linq;
+using Hl7.Fhir.Model;
+using Device = ServerExperiment.Models.POCO.Device;
 
 namespace ServerExperiment.Models.Repository
 {
@@ -23,7 +25,10 @@ namespace ServerExperiment.Models.Repository
         }
 
         public void UpdateResource(IResource device)
-        {          
+        {
+            // If a resources is "deleted" yet we update it, we effectively "undelete" it.
+            device.IsDeleted = false;
+
             _db.Entry(device).State = EntityState.Modified;
         }
 
@@ -46,7 +51,7 @@ namespace ServerExperiment.Models.Repository
                                     .First();
         }
 
-        public void AddCreateRecord(IResource device)
+        public IRecord AddCreateRecord(IResource device)
         {
             var deviceRecord = new DeviceRecord();
 
@@ -54,22 +59,42 @@ namespace ServerExperiment.Models.Repository
             deviceRecord.Device = (Device)device;
 
             _db.DeviceRecords.Add(deviceRecord);
+
+            return deviceRecord;
         }
 
-        public void AddUpdateRecord(IResource device, IRecord record)
+        public IRecord AddUpdateRecord(IResource device, IRecord record)
         {
             var deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.UPDATE);
             deviceRecord.Device = (Device)device;
 
             _db.DeviceRecords.Add(deviceRecord);
+
+            return deviceRecord;
         }
 
-        public void AddDeleteRecord(IResource device, IRecord record)
+        public IRecord AddDeleteRecord(IResource device, IRecord record)
         {
             var deviceRecord = (DeviceRecord)ControllerUtils.AddMetadata(record, ControllerUtils.DELETE);
             deviceRecord.Device = (Device)device;
 
             _db.DeviceRecords.Add(deviceRecord);
+
+            return deviceRecord;
+        }
+
+        public Resource AddMetadata(IResource resource, Resource fhirDevice, IRecord record)
+        {
+            Device device = (Device)resource;
+            fhirDevice.Id = device.DeviceId.ToString();
+            fhirDevice.Meta = new Meta
+            {
+                ElementId = device.DeviceId.ToString(),
+                VersionId = record.VersionId.ToString(),
+                LastUpdated = record.LastModified
+            };
+
+            return fhirDevice;
         }
 
         public void Save()
