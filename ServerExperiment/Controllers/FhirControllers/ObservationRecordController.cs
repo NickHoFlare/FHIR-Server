@@ -24,7 +24,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         }
 
         // GET: fhir/ObservationRecord/5
-        [Route("fhir/ObservationRecord/5")]
+        [Route("fhir/ObservationRecord/{id}")]
         [HttpGet]
         [ResponseType(typeof(ObservationRecord))]
         [RequireHttps]
