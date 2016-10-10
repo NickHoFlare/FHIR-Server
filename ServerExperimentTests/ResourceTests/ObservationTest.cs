@@ -111,7 +111,7 @@ namespace ServerExperimentTests.ResourceTests
             // All OK
             // If no observationId is present in resource object, setting of Header location data will throw exception because no db to increment autonumber index.
             // Added a workaround by causing controller to mock observationId to 7357 if observationId is 0 (not set)
-            var response2 = ObservationController.Create(fhirobservation2, true);
+            var response2 = ObservationController.Create(fhirobservation2, "application/xml+FHIR", true);
             Assert.AreEqual(HttpStatusCode.Created, response2.StatusCode);
             Assert.IsTrue(response2.Headers.Location.ToString().EndsWith("/fhir/observation/7357"));
             mockedRepo.Verify(x => x.AddResource(It.IsAny<Observation>()), Times.Once);
@@ -166,7 +166,7 @@ namespace ServerExperimentTests.ResourceTests
             mockedRepo.Verify(x => x.Save(), Times.Once);
 
             // Case where resource was created
-            var response4 = ObservationController.Update(fhirobservation4, 2, true);
+            var response4 = ObservationController.Update(fhirobservation4, 2, "application/xml+FHIR", true);
             Assert.AreEqual(HttpStatusCode.Created, response4.StatusCode);
             Assert.IsTrue(response4.Headers.Location.ToString().EndsWith("/fhir/observation/7357"));
             mockedRepo.Verify(x => x.AddResource(It.IsAny<Observation>()), Times.Once);

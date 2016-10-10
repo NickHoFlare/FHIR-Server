@@ -182,24 +182,17 @@ namespace ServerExperiment.POCO.FHIR.Mappers
             resource.Name = new List<HumanName>();
             List<HumanName> fhirNames = new List<HumanName>();
 
-            List<string> firstNames = new List<string>();
-            List<string> lastNames = new List<string>();
-            foreach (var first in patient.FirstNames)
+            for (int i = 0; i < patient.FirstNames.Count; i++)
             {
-                firstNames.Add(first);
+                HumanName fhirName = new HumanName()
+                {
+                    Family = new List<string>() { patient.FirstNames[i] },
+                    Given = new List<string>() { patient.LastNames[i] },
+                    Use = HumanName.NameUse.Official
+                };
+                fhirNames.Add(fhirName);
             }
-            foreach (var last in patient.LastNames)
-            {
-                lastNames.Add(last);
-            }
-            HumanName fhirName = new HumanName()
-            {
-                Family = lastNames,
-                Given = firstNames,
-                Use = HumanName.NameUse.Official
-            };
-
-            fhirNames.Add(fhirName);
+            
             resource.Name = fhirNames;
 
             // Patient Birthday
