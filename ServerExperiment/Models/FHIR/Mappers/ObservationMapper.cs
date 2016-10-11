@@ -205,7 +205,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
 
                     if (component.Value is Quantity)
                     {
-                        var value = source.Value as Quantity;
+                        var value = component.Value as Quantity;
                         observation.ValueQuantityCode.Add(value.Code);
                         observation.ValueQuantitySystem.Add(value.System);
                         observation.ValueQuantityUnit.Add(value.Unit);
@@ -213,7 +213,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     }
                     else if (component.Value is CodeableConcept)
                     {
-                        var value = source.Value as CodeableConcept;
+                        var value = component.Value as CodeableConcept;
                         observation.ValueSystem.Add(value.Coding.FirstOrDefault().System);
                         observation.ValueCode.Add(value.Coding.FirstOrDefault().Code);
                         observation.ValueDisplay.Add(value.Coding.FirstOrDefault().Display);
@@ -221,7 +221,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     }
                     else if (component.Value is FhirString)
                     {
-                        var value = source.Value as FhirString;
+                        var value = component.Value as FhirString;
                         observation.ValueString.Add(value.Value);
                     }
                     else if (component.Value is SampledData)
@@ -237,7 +237,7 @@ namespace ServerExperiment.Models.FHIR.Mappers
                     }
                     else if (component.Value is Period)
                     {
-                        var value = source.Value as Period;
+                        var value = component.Value as Period;
                         observation.ValuePeriodStart.Add(DateTime.Parse(value.Start));
                         observation.ValuePeriodEnd.Add(DateTime.Parse(value.End));
                     }
@@ -293,12 +293,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation Category
-            if (!observation.CategoryCode.IsNullOrEmpty() || observation.CategoryDisplay.IsNullOrEmpty() || observation.CategorySystem.IsNullOrEmpty() || !observation.CategoryText.IsNullOrEmpty())
+            if (!observation.CategoryCode.IsNullOrEmpty() || !observation.CategoryDisplay.IsNullOrEmpty() || !observation.CategorySystem.IsNullOrEmpty() || !observation.CategoryText.IsNullOrEmpty())
             {
                 CodeableConcept observationCategory = new CodeableConcept();
                 List<Coding> observationCodings = new List<Coding>();
 
-                if (!observation.CategoryCode.IsNullOrEmpty() || observation.CategoryDisplay.IsNullOrEmpty() || observation.CategorySystem.IsNullOrEmpty())
+                if (!observation.CategoryCode.IsNullOrEmpty() || !observation.CategoryDisplay.IsNullOrEmpty() || !observation.CategorySystem.IsNullOrEmpty())
                 {
                     for (int i = 0; i < observation.CategoryCode.Count ; i++)
                     {
@@ -318,12 +318,12 @@ namespace ServerExperiment.Models.FHIR.Mappers
             }
 
             // Observation Code
-            if (observation.CodeCode.IsNullOrEmpty() || observation.CodeDisplay.IsNullOrEmpty() || observation.CodeSystem.IsNullOrEmpty() || !observation.CodeText.IsNullOrEmpty())
+            if (!observation.CodeCode.IsNullOrEmpty() || !observation.CodeDisplay.IsNullOrEmpty() || !observation.CodeSystem.IsNullOrEmpty() || !observation.CodeText.IsNullOrEmpty())
             {
                 CodeableConcept observationCode = new CodeableConcept();
                 List<Coding> observationCodings = new List<Coding>();
 
-                if (observation.CodeCode.IsNullOrEmpty() || observation.CodeDisplay.IsNullOrEmpty() || observation.CodeSystem.IsNullOrEmpty())
+                if (!observation.CodeCode.IsNullOrEmpty() || !observation.CodeDisplay.IsNullOrEmpty() || !observation.CodeSystem.IsNullOrEmpty())
                 {
                     for (int i = 0; i < observation.CodeCode.Count; i++)
                     {
