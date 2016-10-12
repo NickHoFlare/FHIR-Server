@@ -40,7 +40,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         }
 
         // Methods below are probably not going to be used.
-
+/*
         // PUT: api/ObservationRecord/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutObservationRecord(int id, ObservationRecord observationRecord)
@@ -106,7 +106,7 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             return Ok(observationRecord);
         }
-
+*/
         protected override void Dispose(bool disposing)
         {
             if (disposing)

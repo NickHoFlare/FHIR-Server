@@ -40,7 +40,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         }
 
         // Methods below are probably not going to be used.
-
+/*
         // PUT: api/DeviceRecord/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutDeviceRecord(int id, DeviceRecord deviceRecord)
@@ -106,7 +106,7 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             return Ok(deviceRecord);
         }
-
+*/
         protected override void Dispose(bool disposing)
         {
             if (disposing)

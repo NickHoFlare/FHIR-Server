@@ -40,7 +40,7 @@ namespace ServerExperiment.Controllers.FhirControllers
         }
 
         // Methods below are probably not going to be used.
-
+/*
         // PUT: fhir/PatientRecord/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutPatientRecord(int id, PatientRecord patientRecord)
@@ -106,7 +106,7 @@ namespace ServerExperiment.Controllers.FhirControllers
 
             return Ok(patientRecord);
         }
-
+*/
         protected override void Dispose(bool disposing)
         {
             if (disposing)
